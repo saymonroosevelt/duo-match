@@ -174,9 +174,9 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
     );
 
     const labels = {
-      approved: 'Perfil aprovado. Ele já pode acessar o Duo Match.',
+      approved: 'Perfil aprovado. Ele jÃ¡ pode acessar o Duo Match.',
       rejected: 'Perfil recusado.',
-      pending: 'Perfil devolvido para a fila de análise.',
+      pending: 'Perfil devolvido para a fila de anÃ¡lise.',
     };
     setToast({ type: 'success', message: labels[status] || 'Status atualizado.' });
   }
@@ -213,15 +213,15 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
     setToast({
       type: 'success',
       message:
-        status === 'resolved' ? 'Denúncia resolvida.' : 'Denúncia arquivada.',
+        status === 'resolved' ? 'DenÃºncia resolvida.' : 'DenÃºncia arquivada.',
     });
   }
 
   const refreshing = view === 'profiles' ? loading : reportsLoading;
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
-      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0a0000]/90 backdrop-blur-xl">
+    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: '#0f0a0d' }}>
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0f0a0d]">
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
           <BackButton
             onClick={() => {
@@ -269,7 +269,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                 : 'text-rose-100/50 hover:text-rose-100'
             }`}
           >
-            Denúncias
+            DenÃºncias
             {openReports > 0 && (
               <span className="rounded-full bg-red-700 px-1.5 py-0.5 text-[9px] font-semibold text-white">
                 {openReports}
@@ -281,9 +281,9 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
         {view === 'profiles' ? (
           <>
             <div className="mb-6">
-              <h2 className="text-2xl font-serif text-rose-50">Fila de aprovação</h2>
+              <h2 className="text-2xl font-serif text-rose-50">Fila de aprovaÃ§Ã£o</h2>
           <p className="text-xs text-rose-100/40 mt-1">
-            Revise os perfis com cuidado. A aprovação libera o acesso à área de membros.
+            Revise os perfis com cuidado. A aprovaÃ§Ã£o libera o acesso Ã  Ã¡rea de membros.
           </p>
         </div>
 
@@ -334,7 +334,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar por nome, cidade ou intenção"
+            placeholder="Buscar por nome, cidade ou intenÃ§Ã£o"
             className="w-full rounded-2xl border border-white/10 bg-white/[0.04] py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-rose-100/25 focus:outline-none focus:border-rose-500/40"
           />
         </div>
@@ -366,7 +366,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
               search
                 ? 'Tente outro termo de busca.'
                 : tab === 'pending'
-                  ? 'Tudo em ordem. Novos cadastros aparecerão aqui.'
+                  ? 'Tudo em ordem. Novos cadastros aparecerÃ£o aqui.'
                   : 'Os perfis aparecem aqui conforme o status muda.'
             }
             actionLabel={search ? 'Limpar busca' : 'Atualizar'}
@@ -394,7 +394,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                             {profile.age ? `, ${profile.age}` : ''}
                           </h3>
                           <p className="text-[11px] text-rose-100/40 mt-0.5 truncate">
-                            {profile.city || 'Cidade não informada'}
+                            {profile.city || 'Cidade nÃ£o informada'}
                           </p>
                         </div>
                         <StatusBadge status={profile.status} />
@@ -402,7 +402,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                       <p className="text-[10px] text-rose-100/25 mt-2">
                         Cadastro em{' '}
                         {formatDate(profile.created_at, { year: 'numeric' })}
-                        {profile.role === 'admin' ? ' · admin' : ''}
+                        {profile.role === 'admin' ? ' Â· admin' : ''}
                       </p>
                     </div>
                   </div>
@@ -417,7 +417,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                   )}
 
                   <p className="text-xs text-rose-100/50 leading-relaxed mt-3 whitespace-pre-line">
-                    {profile.bio || 'Sem descrição.'}
+                    {profile.bio || 'Sem descriÃ§Ã£o.'}
                   </p>
 
                   {asArray(profile.intentions).length > 0 && (
@@ -456,7 +456,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                           profile,
                           'approved',
                           'Aprovar perfil',
-                          `${profile.full_name || 'Este perfil'} poderá acessar o Descobrir, matches e conversas.`,
+                          `${profile.full_name || 'Este perfil'} poderÃ¡ acessar o Descobrir, matches e conversas.`,
                         )
                       }
                       disabled={actioningId === profile.id}
@@ -474,7 +474,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                           profile,
                           'rejected',
                           'Recusar perfil',
-                          `${profile.full_name || 'Este perfil'} não poderá acessar a área de membros. Você pode reverter depois.`,
+                          `${profile.full_name || 'Este perfil'} nÃ£o poderÃ¡ acessar a Ã¡rea de membros. VocÃª pode reverter depois.`,
                           true,
                         )
                       }
@@ -492,8 +492,8 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                         requestAction(
                           profile,
                           'pending',
-                          'Voltar para análise',
-                          `${profile.full_name || 'Este perfil'} voltará para a fila de curadoria.`,
+                          'Voltar para anÃ¡lise',
+                          `${profile.full_name || 'Este perfil'} voltarÃ¡ para a fila de curadoria.`,
                         )
                       }
                       disabled={actioningId === profile.id}
@@ -510,8 +510,8 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                         requestAction(
                           profile,
                           'pending',
-                          'Voltar para análise',
-                          `${profile.full_name || 'Este perfil'} voltará para a fila de curadoria.`,
+                          'Voltar para anÃ¡lise',
+                          `${profile.full_name || 'Este perfil'} voltarÃ¡ para a fila de curadoria.`,
                         )
                       }
                       disabled={actioningId === profile.id}
@@ -529,9 +529,9 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
         ) : (
           <>
             <div className="mb-6">
-              <h2 className="text-2xl font-serif text-rose-50">Denúncias</h2>
+              <h2 className="text-2xl font-serif text-rose-50">DenÃºncias</h2>
               <p className="text-xs text-rose-100/40 mt-1">
-                Revise os relatos enviados pelos membros e tome uma ação.
+                Revise os relatos enviados pelos membros e tome uma aÃ§Ã£o.
               </p>
             </div>
 
@@ -577,11 +577,11 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
             ) : filteredReports.length === 0 ? (
               <EmptyState
                 icon={ShieldAlert}
-                title="Nenhuma denúncia aqui"
+                title="Nenhuma denÃºncia aqui"
                 description={
                   reportFilter === 'open'
-                    ? 'Nenhum relato aguardando análise. A comunidade está em dia.'
-                    : 'As denúncias aparecem aqui conforme o status muda.'
+                    ? 'Nenhum relato aguardando anÃ¡lise. A comunidade estÃ¡ em dia.'
+                    : 'As denÃºncias aparecem aqui conforme o status muda.'
                 }
                 actionLabel="Atualizar"
                 onAction={loadReports}
@@ -608,7 +608,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
                               </h3>
                               <p className="text-[10px] text-rose-100/30 mt-0.5">
                                 Denunciado por{' '}
-                                {report.reporter?.full_name || 'usuário removido'}{' '}
+                                {report.reporter?.full_name || 'usuÃ¡rio removido'}{' '}
                                 em{' '}
                                 {formatDate(report.created_at, {
                                   year: 'numeric',
@@ -755,7 +755,7 @@ function StatusBadge({ status }) {
       icon: XCircle,
     },
   }[status] || {
-    label: status || '—',
+    label: status || 'â€”',
     className: 'border-white/10 bg-white/5 text-rose-100/50',
     icon: Clock,
   };

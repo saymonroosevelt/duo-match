@@ -82,7 +82,7 @@ export default function OnboardingScreen({ session }) {
       return;
     }
     if (!formData.relationship_intention) {
-      setError('Escolha o que você está procurando construir.');
+      setError('Escolha o que vocÃª estÃ¡ procurando construir.');
       return;
     }
     if (formData.interests.length === 0) {
@@ -118,8 +118,7 @@ export default function OnboardingScreen({ session }) {
 
   if (saved) {
     return (
-      <div className="min-h-[100dvh] bg-[#0a0000] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
-        <div className="absolute top-1/3 w-full h-1/2 bg-rose-900/15 blur-[110px] rounded-full pointer-events-none" />
+      <div className="min-h-[100dvh] bg-[#0a0000] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{ background: '#0f0a0d' }}>
         <div className="relative z-10 max-w-sm w-full text-center">
           <div className="w-20 h-20 rounded-full border border-emerald-700/30 bg-emerald-950/30 flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={36} className="text-emerald-300/80" />
@@ -139,7 +138,7 @@ export default function OnboardingScreen({ session }) {
             <RefreshCw size={15} /> Verificar status
           </button>
           <p className="text-[10px] text-rose-100/25 mt-5 leading-relaxed">
-            Não é necessário pagar para participar da curadoria.
+            NÃ£o Ã© necessÃ¡rio pagar para participar da curadoria.
           </p>
         </div>
       </div>
@@ -147,8 +146,7 @@ export default function OnboardingScreen({ session }) {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white p-6 flex flex-col relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
-      <div className="absolute top-0 right-0 w-full h-1/2 bg-rose-900/10 blur-[110px] rounded-full pointer-events-none" />
+    <div className="min-h-[100dvh] bg-[#0a0000] text-white p-6 flex flex-col relative overflow-hidden" style={{ background: '#0f0a0d' }}>
 
       <div className="flex items-center justify-between mb-5 z-10 pt-2">
         {step > 1 ? (
@@ -187,9 +185,9 @@ export default function OnboardingScreen({ session }) {
         {step === 1 && (
           <div className="animate-fade-in flex flex-col gap-5">
             <div>
-              <h2 className="text-3xl font-serif mb-1 text-rose-50">Quem é você?</h2>
+              <h2 className="text-3xl font-serif mb-1 text-rose-50">Quem Ã© vocÃª?</h2>
               <p className="text-sm text-rose-100/45">
-                Essas informações ajudam a curadoria a entender seu perfil.
+                Essas informaÃ§Ãµes ajudam a curadoria a entender seu perfil.
               </p>
             </div>
 
@@ -222,7 +220,7 @@ export default function OnboardingScreen({ session }) {
                 />
               </div>
               <p className="text-[10px] text-rose-100/25 mt-2">
-                Foto opcional · pode adicionar depois
+                Foto opcional Â· pode adicionar depois
               </p>
               {photoWarning && (
                 <p className="text-[10px] text-amber-300/60 mt-1 text-center max-w-[280px]">
@@ -262,14 +260,14 @@ export default function OnboardingScreen({ session }) {
                   value={formData.city}
                   onChange={(event) => updateForm('city', event.target.value)}
                   className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] p-4 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-rose-500/50"
-                  placeholder="Florianópolis, SC"
+                  placeholder="FlorianÃ³polis, SC"
                 />
               </label>
             </div>
 
             <label className="block">
               <span className="text-xs text-rose-100/55 ml-1">
-                Sobre você (opcional)
+                Sobre vocÃª (opcional)
               </span>
               <textarea
                 value={formData.bio}
@@ -299,10 +297,10 @@ export default function OnboardingScreen({ session }) {
           <div className="animate-fade-in flex flex-col gap-5">
             <div>
               <h2 className="text-3xl font-serif mb-1 text-rose-50">
-                O que você está procurando construir?
+                O que vocÃª estÃ¡ procurando construir?
               </h2>
               <p className="text-sm text-rose-100/45">
-                Escolha a intenção que mais representa você agora.
+                Escolha a intenÃ§Ã£o que mais representa vocÃª agora.
               </p>
             </div>
 
@@ -347,7 +345,7 @@ export default function OnboardingScreen({ session }) {
                 Explore por interesses
               </h2>
               <p className="text-sm text-rose-100/45">
-                Selecione o que mais combina com você. Isso ajuda nos matches e nas
+                Selecione o que mais combina com vocÃª. Isso ajuda nos matches e nas
                 comunidades.
               </p>
             </div>
@@ -394,8 +392,8 @@ export default function OnboardingScreen({ session }) {
             </button>
 
             <p className="text-[10px] text-center text-rose-100/25 leading-relaxed">
-              Ao finalizar, seu perfil entra na fila de curadoria. O acesso só é
-              liberado após a aprovação.
+              Ao finalizar, seu perfil entra na fila de curadoria. O acesso sÃ³ Ã©
+              liberado apÃ³s a aprovaÃ§Ã£o.
             </p>
           </div>
         )}

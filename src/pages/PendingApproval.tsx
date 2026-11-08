@@ -8,8 +8,7 @@ export default function PendingApproval() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
-      <div className="absolute top-1/3 w-full h-1/2 bg-rose-900/15 blur-[110px] rounded-full pointer-events-none" />
+    <div className="min-h-[100dvh] bg-[#0a0000] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{ background: '#0f0a0d' }}>
 
       <div className="relative z-10 max-w-sm w-full">
         <div className="flex justify-center mb-6">
@@ -19,30 +18,30 @@ export default function PendingApproval() {
         </div>
 
         <h1 className="text-4xl font-serif mb-3 text-rose-50 text-center leading-tight">
-          Perfil em análise
+          Perfil em anÃ¡lise
         </h1>
         <p className="text-rose-100/55 mb-8 leading-relaxed text-center text-sm">
-          Nossa curadoria está verificando seus dados com cuidado. O acesso ao
-          Descobrir, matches e conversas é liberado somente após a aprovação.
+          Nossa curadoria estÃ¡ verificando seus dados com cuidado. O acesso ao
+          Descobrir, matches e conversas Ã© liberado somente apÃ³s a aprovaÃ§Ã£o.
         </p>
 
         <div className="rounded-3xl border border-white/[0.07] bg-white/[0.035] p-5 mb-8">
           <TimelineItem
             icon={Check}
             title="Cadastro recebido"
-            description="Seus dados foram enviados com segurança."
+            description="Seus dados foram enviados com seguranÃ§a."
             state="done"
           />
           <TimelineItem
             icon={Clock}
             title="Curadoria em andamento"
-            description="Nossa equipe avalia perfil, intenções e interesses."
+            description="Nossa equipe avalia perfil, intenÃ§Ãµes e interesses."
             state="active"
           />
           <TimelineItem
             icon={Lock}
             title="Acesso liberado"
-            description="Você poderá explorar, dar match e conversar."
+            description="VocÃª poderÃ¡ explorar, dar match e conversar."
             state="locked"
             last
           />
@@ -66,7 +65,7 @@ export default function PendingApproval() {
         </div>
 
         <p className="text-center text-[10px] text-rose-100/25 mt-6 leading-relaxed">
-          A análise é manual e pode levar alguns minutos. Não é necessário pagar
+          A anÃ¡lise Ã© manual e pode levar alguns minutos. NÃ£o Ã© necessÃ¡rio pagar
           para participar da curadoria.
         </p>
       </div>

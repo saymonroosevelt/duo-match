@@ -10,8 +10,8 @@ export default function Interests({
   onSelectInterest?: (interest: string) => void;
 }) {
   return (
-    <div className="min-h-[100dvh] bg-[#0F0F10] text-white" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
-      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0F0F10]/90 backdrop-blur-xl">
+    <div className="min-h-[100dvh] bg-[#0F0F10] text-white" style={{ background: '#0f0a0d' }}>
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0f0a0d]">
         <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
           {onBack ? <BackButton onClick={onBack} /> : <div className="w-16" />}
           <h1 className="text-xl font-serif text-rose-50">Interesses</h1>
@@ -25,11 +25,11 @@ export default function Interests({
             Comunidades Duo Match
           </p>
           <h2 className="text-3xl font-serif text-rose-50 leading-tight">
-            Encontre pessoas que gostam das mesmas coisas que você.
+            Encontre pessoas que gostam das mesmas coisas que vocÃª.
           </h2>
           <p className="text-sm text-rose-100/40 leading-relaxed mt-3">
             Toque em um interesse para ver perfis aprovados que compartilham essa
-            paixão.
+            paixÃ£o.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ export default function Interests({
         </div>
 
         <p className="text-center text-[10px] uppercase tracking-[0.2em] text-rose-100/20 mt-8">
-          Curadoria privada · Duo Match
+          Curadoria privada Â· Duo Match
         </p>
       </div>
     </div>

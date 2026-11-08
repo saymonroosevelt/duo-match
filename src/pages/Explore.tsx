@@ -78,7 +78,7 @@ export default function Explore({
 
     setUserId(user.id);
 
-    // Bloqueios: se a tabela ainda não existir, o app continua funcionando.
+    // Bloqueios: se a tabela ainda nÃ£o existir, o app continua funcionando.
     let blockedIds = new Set<string>();
     const { data: blockedRows, error: blockedError } = await supabase
       .from('blocks')
@@ -237,7 +237,7 @@ export default function Explore({
 
       if (existing) {
         if (existing.status === 'matched') {
-          setToast({ type: 'success', message: 'Vocês já são um match.' });
+          setToast({ type: 'success', message: 'VocÃªs jÃ¡ sÃ£o um match.' });
           advance();
           return;
         }
@@ -247,14 +247,14 @@ export default function Explore({
             type: 'success',
             message:
               action === 'superlike'
-                ? 'Seu destaque já foi enviado.'
-                : 'Você já demonstrou interesse nessa pessoa.',
+                ? 'Seu destaque jÃ¡ foi enviado.'
+                : 'VocÃª jÃ¡ demonstrou interesse nessa pessoa.',
           });
           advance();
           return;
         }
 
-        // A outra pessoa já curtiu: agora o match é recíproco.
+        // A outra pessoa jÃ¡ curtiu: agora o match Ã© recÃ­proco.
         const { error: matchError } = await supabase
           .from('matches')
           .update({ status: 'matched' })
@@ -280,7 +280,7 @@ export default function Explore({
         message:
           action === 'superlike'
             ? `Destaque enviado para ${firstName(current.full_name)}.`
-            : 'Interesse enviado. Se for recíproco, vira match.',
+            : 'Interesse enviado. Se for recÃ­proco, vira match.',
       });
       advance();
     } catch (actionError) {
@@ -293,7 +293,7 @@ export default function Explore({
   const allSeen = !loading && profiles.length > 0 && index >= profiles.length;
 
   return (
-    <div className="min-h-full bg-[#0F0F10] text-white px-4 pt-4 pb-6" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
+    <div className="min-h-full bg-[#0F0F10] text-white px-4 pt-4 pb-6" style={{ background: '#0f0a0d' }}>
       <div className="max-w-md mx-auto w-full flex items-start justify-between gap-4 mb-4">
         <div>
           <h1 className="text-3xl font-serif text-rose-50 tracking-tight">Descobrir</h1>
@@ -341,7 +341,7 @@ export default function Explore({
             )}
             {(filters.minAge > 18 || filters.maxAge < 99) && (
               <span className="text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-rose-100/60">
-                {filters.minAge}–{filters.maxAge} anos
+                {filters.minAge}â€“{filters.maxAge} anos
               </span>
             )}
           </div>
@@ -370,17 +370,17 @@ export default function Explore({
         <div className="max-w-md mx-auto">
           <div className="h-[calc(100vh-310px)] min-h-[420px] max-h-[640px] rounded-[36px] bg-white/[0.04] border border-white/5 animate-pulse" />
           <p className="text-center text-rose-100/30 text-sm mt-6 font-serif">
-            A curadoria está preparando novos perfis...
+            A curadoria estÃ¡ preparando novos perfis...
           </p>
         </div>
       ) : profiles.length === 0 ? (
         <EmptyState
           icon={Sparkles}
-          title={hasFilters ? 'Nenhum perfil com esses filtros' : 'Novas conexões em breve'}
+          title={hasFilters ? 'Nenhum perfil com esses filtros' : 'Novas conexÃµes em breve'}
           description={
             hasFilters
               ? 'Tente ampliar a idade, mudar a cidade ou remover o interesse selecionado.'
-              : 'Assim que novas pessoas forem aprovadas pela curadoria, elas aparecerão aqui. Você também pode explorar comunidades de interesse.'
+              : 'Assim que novas pessoas forem aprovadas pela curadoria, elas aparecerÃ£o aqui. VocÃª tambÃ©m pode explorar comunidades de interesse.'
           }
           actionLabel="Atualizar"
           onAction={() => setRefreshKey((key) => key + 1)}
@@ -390,8 +390,8 @@ export default function Explore({
       ) : allSeen ? (
         <EmptyState
           icon={Heart}
-          title="Você viu todos por agora"
-          description="Novos perfis aprovados aparecem aqui. Enquanto isso, dê uma olhada nas comunidades ou revise seus matches."
+          title="VocÃª viu todos por agora"
+          description="Novos perfis aprovados aparecem aqui. Enquanto isso, dÃª uma olhada nas comunidades ou revise seus matches."
           actionLabel="Atualizar"
           onAction={() => setRefreshKey((key) => key + 1)}
           secondaryLabel={hasFilters ? 'Ajustar filtros' : undefined}
@@ -407,9 +407,9 @@ export default function Explore({
                 className="absolute inset-0 w-full h-full object-cover"
               />
             ) : (
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(190,24,93,0.35),transparent_55%),linear-gradient(150deg,#2A050A,#0F0F10_65%)] flex flex-col items-center justify-center">
+              <div className="absolute inset-0 bg-[#1a0205] flex flex-col items-center justify-center">
                 <div className="w-28 h-28 rounded-full border border-rose-200/20 bg-black/20 flex items-center justify-center font-serif text-5xl text-rose-100/70">
-                  {(current.full_name || '♡').trim().charAt(0).toUpperCase()}
+                  {(current.full_name || 'â™¡').trim().charAt(0).toUpperCase()}
                 </div>
                 <p className="text-rose-100/30 text-xs uppercase tracking-[0.25em] mt-5">
                   Foto em breve
@@ -423,7 +423,7 @@ export default function Explore({
               <div className="flex flex-col gap-2">
                 {current.likedYou && (
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600/90 backdrop-blur px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg">
-                    <Heart size={12} fill="white" /> Curtiu você
+                    <Heart size={12} fill="white" /> Curtiu vocÃª
                   </span>
                 )}
                 {current.is_verified && (
@@ -454,7 +454,7 @@ export default function Explore({
 
               <div className="flex items-center gap-1.5 text-white/60 text-xs">
                 <MapPin size={13} />
-                <span>{current.city || 'Localização não informada'}</span>
+                <span>{current.city || 'LocalizaÃ§Ã£o nÃ£o informada'}</span>
               </div>
 
               {current.what_procura && (
@@ -487,7 +487,7 @@ export default function Explore({
               )}
 
               <p className="text-white/70 text-xs leading-relaxed line-clamp-2">
-                {current.bio || 'Buscando conexões reais e valores compartilhados.'}
+                {current.bio || 'Buscando conexÃµes reais e valores compartilhados.'}
               </p>
             </div>
           </div>
@@ -523,7 +523,7 @@ export default function Explore({
           </div>
 
           <p className="text-center text-[10px] text-rose-100/25 uppercase tracking-[0.2em] -mt-2">
-            {processing ? 'Registrando...' : 'Deslize com intenção'}
+            {processing ? 'Registrando...' : 'Deslize com intenÃ§Ã£o'}
           </p>
         </div>
       )}
@@ -556,7 +556,7 @@ export default function Explore({
 
             <div className="grid grid-cols-2 gap-3 mb-5">
               <label className="block">
-                <span className="text-xs text-rose-100/60 ml-1">Idade mínima</span>
+                <span className="text-xs text-rose-100/60 ml-1">Idade mÃ­nima</span>
                 <input
                   type="number"
                   min={18}
@@ -572,7 +572,7 @@ export default function Explore({
                 />
               </label>
               <label className="block">
-                <span className="text-xs text-rose-100/60 ml-1">Idade máxima</span>
+                <span className="text-xs text-rose-100/60 ml-1">Idade mÃ¡xima</span>
                 <input
                   type="number"
                   min={18}
@@ -597,7 +597,7 @@ export default function Explore({
                 onChange={(event) =>
                   setDraftFilters((prev) => ({ ...prev, city: event.target.value }))
                 }
-                placeholder="Ex: Florianópolis"
+                placeholder="Ex: FlorianÃ³polis"
                 className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-white placeholder:text-white/25 focus:outline-none focus:border-rose-500/50"
               />
             </label>
@@ -665,9 +665,9 @@ export default function Explore({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(190,24,93,0.35),transparent_55%),linear-gradient(150deg,#2A050A,#0F0F10_65%)] flex items-center justify-center">
+                <div className="w-full h-full bg-[#1a0205] flex items-center justify-center">
                   <span className="font-serif text-6xl text-rose-100/60">
-                    {(current.full_name || '♡').trim().charAt(0).toUpperCase()}
+                    {(current.full_name || 'â™¡').trim().charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
@@ -686,7 +686,7 @@ export default function Explore({
                   {current.age ? `, ${current.age}` : ''}
                 </h2>
                 <p className="text-white/60 text-xs flex items-center gap-1.5 mt-1">
-                  <MapPin size={13} /> {current.city || 'Localização não informada'}
+                  <MapPin size={13} /> {current.city || 'LocalizaÃ§Ã£o nÃ£o informada'}
                 </p>
               </div>
             </div>
@@ -706,7 +706,7 @@ export default function Explore({
                   Sobre
                 </p>
                 <p className="text-sm text-rose-100/75 leading-relaxed whitespace-pre-line">
-                  {current.bio || 'Sem descrição por enquanto.'}
+                  {current.bio || 'Sem descriÃ§Ã£o por enquanto.'}
                 </p>
               </div>
 
@@ -731,7 +731,7 @@ export default function Explore({
               {asArray(current.values_inegotiable).length > 0 && (
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-rose-100/40 mb-2">
-                    Valores inegociáveis
+                    Valores inegociÃ¡veis
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {asArray(current.values_inegotiable).map((value: string) => (
@@ -782,10 +782,10 @@ export default function Explore({
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-rose-900 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-rose-900/50">
               <Heart size={30} fill="white" className="text-white" />
             </div>
-            <h2 className="text-3xl font-serif text-rose-50 mb-2">É um match!</h2>
+            <h2 className="text-3xl font-serif text-rose-50 mb-2">Ã‰ um match!</h2>
             <p className="text-sm text-rose-100/60 leading-relaxed mb-6">
-              Você e {firstName(matchInfo.otherUser.full_name)} demonstraram
-              interesse recíproco. Agora é só começar a conversa.
+              VocÃª e {firstName(matchInfo.otherUser.full_name)} demonstraram
+              interesse recÃ­proco. Agora Ã© sÃ³ comeÃ§ar a conversa.
             </p>
             <div className="flex justify-center mb-6">
               <Avatar

@@ -64,7 +64,7 @@ export default function PlansScreen({ user, onBack }) {
       setToast({
         type: 'error',
         message:
-          'O plano ainda não está no banco. Rode o SQL de consolidação do briefing no Supabase.',
+          'O plano ainda nÃ£o estÃ¡ no banco. Rode o SQL de consolidaÃ§Ã£o do briefing no Supabase.',
       });
       return;
     }
@@ -112,7 +112,7 @@ export default function PlansScreen({ user, onBack }) {
         setToast({
           type: 'error',
           message:
-            'Você já tem um plano ativo. A troca será liberada junto com o pagamento.',
+            'VocÃª jÃ¡ tem um plano ativo. A troca serÃ¡ liberada junto com o pagamento.',
         });
         return;
       }
@@ -131,8 +131,8 @@ export default function PlansScreen({ user, onBack }) {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
-      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0a0000]/90 backdrop-blur-xl">
+    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: '#0f0a0d' }}>
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0f0a0d]">
         <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
           <BackButton onClick={onBack} />
           <h1 className="text-xl font-serif text-rose-50">Planos</h1>
@@ -149,8 +149,8 @@ export default function PlansScreen({ user, onBack }) {
             Escolha como viver o Duo Match.
           </h2>
           <p className="text-sm text-rose-100/45 leading-relaxed mt-2 max-w-xs mx-auto">
-            A curadoria aprova cada perfil antes do acesso. O pagamento será
-            habilitado em breve e nenhuma cobrança é feita agora.
+            A curadoria aprova cada perfil antes do acesso. O pagamento serÃ¡
+            habilitado em breve e nenhuma cobranÃ§a Ã© feita agora.
           </p>
         </div>
 
@@ -162,7 +162,7 @@ export default function PlansScreen({ user, onBack }) {
                 : 'border-amber-700/30 bg-amber-950/20 text-amber-200/80'
             }`}
           >
-            Plano atual: <strong>{planState.plan?.name || 'selecionado'}</strong> ·{' '}
+            Plano atual: <strong>{planState.plan?.name || 'selecionado'}</strong> Â·{' '}
             {PLAN_STATUS_LABELS[planState.subscription.status] ||
               planState.subscription.status}
           </div>
@@ -170,8 +170,8 @@ export default function PlansScreen({ user, onBack }) {
 
         {usingFallback && (
           <div className="mb-4 rounded-2xl border border-amber-700/25 bg-amber-950/20 px-4 py-3 text-[11px] text-amber-200/70 leading-relaxed">
-            Exibindo a prévia dos planos. Rode o SQL de consolidação do briefing
-            no Supabase para habilitar a seleção.
+            Exibindo a prÃ©via dos planos. Rode o SQL de consolidaÃ§Ã£o do briefing
+            no Supabase para habilitar a seleÃ§Ã£o.
           </div>
         )}
 
@@ -201,14 +201,10 @@ export default function PlansScreen({ user, onBack }) {
                   key={plan.id || plan.slug}
                   className={`relative overflow-hidden rounded-[28px] border p-6 ${
                     highlight
-                      ? 'border-rose-500/40 bg-gradient-to-br from-rose-950/50 via-[#171719] to-[#171719]'
+                      ? 'border-rose-500/40 bg-[#1a0205]'
                       : 'border-white/[0.08] bg-white/[0.035]'
                   }`}
                 >
-                  {highlight && (
-                    <div className="absolute -right-10 -top-12 w-40 h-40 rounded-full bg-rose-600/15 blur-3xl pointer-events-none" />
-                  )}
-
                   <div className="relative">
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -223,7 +219,7 @@ export default function PlansScreen({ user, onBack }) {
                           )}
                         </div>
                         <p className="text-xs text-rose-100/45 leading-relaxed mt-2 max-w-[280px]">
-                          {plan.description || 'Uma experiência Duo Match.'}
+                          {plan.description || 'Uma experiÃªncia Duo Match.'}
                         </p>
                       </div>
                       {isCurrent && (
@@ -238,7 +234,7 @@ export default function PlansScreen({ user, onBack }) {
                         {formatPrice(plan.price)}
                       </span>
                       <span className="text-xs text-rose-100/35 mb-1">
-                        /{plan.interval === 'year' ? 'ano' : 'mês'}
+                        /{plan.interval === 'year' ? 'ano' : 'mÃªs'}
                       </span>
                     </div>
 
@@ -305,17 +301,17 @@ export default function PlansScreen({ user, onBack }) {
           <InfoRow
             icon={ShieldCheck}
             title="Curadoria antes do acesso"
-            text="Cada perfil é aprovado manualmente antes de aparecer no Descobrir."
+            text="Cada perfil Ã© aprovado manualmente antes de aparecer no Descobrir."
           />
           <InfoRow
             icon={Lock}
-            title="Pagamento seguro, sem simulação"
-            text="A arquitetura já está pronta para um gateway real. Nada é cobrado nesta versão."
+            title="Pagamento seguro, sem simulaÃ§Ã£o"
+            text="A arquitetura jÃ¡ estÃ¡ pronta para um gateway real. Nada Ã© cobrado nesta versÃ£o."
           />
           <InfoRow
             icon={Sparkles}
             title="Cancele quando quiser"
-            text="O gerenciamento da assinatura será liberado junto com o pagamento."
+            text="O gerenciamento da assinatura serÃ¡ liberado junto com o pagamento."
           />
         </div>
       </div>
@@ -331,7 +327,7 @@ export default function PlansScreen({ user, onBack }) {
               Plano selecionado
             </h2>
             <p className="text-sm text-rose-100/55 leading-relaxed">
-              Você escolheu o <strong>{confirmation.plan.name}</strong>.
+              VocÃª escolheu o <strong>{confirmation.plan.name}</strong>.
             </p>
             <p className="text-xs text-amber-200/60 leading-relaxed mt-3">
               {confirmation.message}

@@ -1,24 +1,6 @@
 export default function WelcomeScreen({ onStart, onEnterAccount }) {
   return (
-    <main className="relative min-h-[100dvh] w-full bg-[#2a0610] text-[#f8e3d8]">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/silk.jpg')" }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(10,0,0,0.10),transparent_58%)]"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/45 to-transparent"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-black/60 via-black/20 to-transparent"
-        aria-hidden="true"
-      />
-
+    <main className="relative min-h-[100dvh] w-full bg-[#0f0a0d] text-[#f8e3d8]">
       <div
         className="relative z-10 flex min-h-[100dvh] flex-col items-center px-8"
         style={{
@@ -29,7 +11,7 @@ export default function WelcomeScreen({ onStart, onEnterAccount }) {
         }}
       >
         <div className="flex flex-col items-center text-center">
-          <MatchMark className="h-[120px] w-[120px] drop-shadow-[0_10px_28px_rgba(0,0,0,0.38)] sm:h-[135px] sm:w-[135px]" />
+          <MatchMark className="h-[120px] w-[120px] sm:h-[135px] sm:w-[135px]" />
           <h1 className="-mt-1 font-logo text-[64px] font-medium leading-none tracking-[-0.055em] text-[#f8e3d8] sm:text-[72px]">
             match
           </h1>
@@ -44,7 +26,7 @@ export default function WelcomeScreen({ onStart, onEnterAccount }) {
           <button
             type="button"
             onClick={onStart}
-            className="w-full rounded-full bg-[#f8e3d8] py-3.5 text-[15px] font-semibold text-[#3a1219] shadow-[0_14px_40px_rgba(0,0,0,0.30)] transition-all duration-200 hover:bg-white active:scale-[0.985]"
+            className="w-full rounded-full bg-[#f8e3d8] py-3.5 text-[15px] font-semibold text-[#3a1219] transition-colors duration-200 hover:bg-white active:scale-[0.985]"
           >
             Começar
           </button>
@@ -83,20 +65,6 @@ function MatchMark({ className }) {
           <stop offset="0.45" stopColor="#F9E4D9" />
           <stop offset="0.75" stopColor="#F5D0C2" />
           <stop offset="1" stopColor="#EFC4B4" />
-        </linearGradient>
-        <linearGradient
-          id="duo-match-right"
-          x1="64"
-          y1="36"
-          x2="100"
-          y2="100"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#F5C4B4" />
-          <stop offset="0.1" stopColor="#F0B6A6" />
-          <stop offset="0.5" stopColor="#E39B91" />
-          <stop offset="0.8" stopColor="#D48686" />
-          <stop offset="1" stopColor="#C97874" />
         </linearGradient>
         <linearGradient
           id="duo-match-stick"

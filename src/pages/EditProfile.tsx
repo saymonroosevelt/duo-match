@@ -129,8 +129,8 @@ export default function EditProfile({
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
-      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0a0000]/90 backdrop-blur-xl">
+    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: '#0f0a0d' }}>
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0f0a0d]">
         <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
           <BackButton onClick={onBack} />
           <h1 className="text-xl font-serif text-rose-50">Editar perfil</h1>
@@ -164,7 +164,7 @@ export default function EditProfile({
             />
           </div>
           <p className="text-[10px] text-rose-100/30 mt-3 text-center">
-            Foto pública para membros aprovados · até 5 MB
+            Foto pÃºblica para membros aprovados Â· atÃ© 5 MB
           </p>
           {form.photo_url && (
             <button
@@ -206,20 +206,20 @@ export default function EditProfile({
                 value={form.city}
                 onChange={(event) => update('city', event.target.value)}
                 className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white focus:outline-none focus:border-rose-500/40"
-                placeholder="Florianópolis, SC"
+                placeholder="FlorianÃ³polis, SC"
               />
             </label>
           </div>
 
           <label className="block">
-            <span className="text-xs text-rose-100/55 ml-1">Sobre você</span>
+            <span className="text-xs text-rose-100/55 ml-1">Sobre vocÃª</span>
             <textarea
               value={form.bio}
               onChange={(event) => update('bio', event.target.value)}
               rows={4}
               maxLength={700}
               className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white placeholder:text-rose-100/25 focus:outline-none focus:border-rose-500/40 resize-none"
-              placeholder="Conte um pouco sobre você, sua rotina e o que valoriza."
+              placeholder="Conte um pouco sobre vocÃª, sua rotina e o que valoriza."
             />
             <span className="block text-right text-[9px] text-rose-100/25 mt-1">
               {form.bio.length}/700
@@ -227,7 +227,7 @@ export default function EditProfile({
           </label>
 
           <label className="block">
-            <span className="text-xs text-rose-100/55 ml-1">O que você busca</span>
+            <span className="text-xs text-rose-100/55 ml-1">O que vocÃª busca</span>
             <select
               value={form.what_procura}
               onChange={(event) => update('what_procura', event.target.value)}
@@ -267,7 +267,7 @@ export default function EditProfile({
 
           <div>
             <span className="text-xs text-rose-100/55 ml-1">
-              Valores inegociáveis
+              Valores inegociÃ¡veis
             </span>
             <div className="flex flex-wrap gap-2 mt-2">
               {VALUES_OPTIONS.map((value) => {
@@ -298,7 +298,7 @@ export default function EditProfile({
         )}
       </form>
 
-      <div className="fixed bottom-0 left-0 right-0 border-t border-white/[0.07] bg-[#0a0000]/95 backdrop-blur-xl px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-white/[0.07] bg-[#0f0a0d] px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <div className="max-w-md mx-auto">
           <button
             type="button"
@@ -312,7 +312,7 @@ export default function EditProfile({
               </>
             ) : (
               <>
-                <Save size={16} /> Salvar alterações
+                <Save size={16} /> Salvar alteraÃ§Ãµes
               </>
             )}
           </button>

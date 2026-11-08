@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Fallbacks publishable (seguras para o bundle público; RLS protege os dados).
+// Variáveis de ambiente da Netlify, se definidas, têm precedência.
+const supabaseUrl =
+  import.meta.env.VITE_SUPABASE_URL ||
+  'https://hnvcxgbgjxbtlvnrehqn.supabase.co';
+const supabaseAnonKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
+  'sb_publishable_BdVgtFsy-RFG_FMHIes3QQ_8Uj1EhaX';
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 

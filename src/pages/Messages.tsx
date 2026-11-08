@@ -44,13 +44,13 @@ export default function Messages({
   }
 
   return (
-    <div className="min-h-full bg-[#0F0F10] text-white px-5 pt-5 pb-8" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
+    <div className="min-h-full bg-[#0F0F10] text-white px-5 pt-5 pb-8" style={{ background: '#0f0a0d' }}>
       <div className="max-w-md mx-auto">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
             <h1 className="text-3xl font-serif text-rose-50 tracking-tight">Mensagens</h1>
             <p className="text-rose-100/40 text-xs mt-1">
-              Conversas que começaram com um match.
+              Conversas que comeÃ§aram com um match.
             </p>
           </div>
           <button
@@ -100,7 +100,7 @@ export default function Messages({
             description={
               search
                 ? 'Tente buscar por outro nome.'
-                : 'Quando você e outra pessoa demonstrarem interesse recíproco, a conversa aparece aqui.'
+                : 'Quando vocÃª e outra pessoa demonstrarem interesse recÃ­proco, a conversa aparece aqui.'
             }
             actionLabel={!search ? 'Descobrir pessoas' : undefined}
             onAction={!search ? onGoExplore : undefined}
@@ -137,12 +137,12 @@ export default function Messages({
                     <p className="text-xs text-rose-100/45 truncate mt-0.5">
                       {last ? (
                         <>
-                          {isMine && <span className="text-rose-200/60">Você: </span>}
+                          {isMine && <span className="text-rose-200/60">VocÃª: </span>}
                           {last.content}
                         </>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-rose-300/60">
-                          <Sparkles size={12} /> Vocês deram match. Diga olá.
+                          <Sparkles size={12} /> VocÃªs deram match. Diga olÃ¡.
                         </span>
                       )}
                     </p>

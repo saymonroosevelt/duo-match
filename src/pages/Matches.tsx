@@ -48,7 +48,7 @@ export default function Matches({
 
       setToast({
         type: 'success',
-        message: `É um match com ${firstName(like.otherUser?.full_name)}! Abra a conversa.`,
+        message: `Ã‰ um match com ${firstName(like.otherUser?.full_name)}! Abra a conversa.`,
       });
       await reload();
     } catch (likeError) {
@@ -59,13 +59,13 @@ export default function Matches({
   }
 
   return (
-    <div className="min-h-full bg-[#0F0F10] text-white px-5 pt-5 pb-8" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
+    <div className="min-h-full bg-[#0F0F10] text-white px-5 pt-5 pb-8" style={{ background: '#0f0a0d' }}>
       <div className="max-w-md mx-auto">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
             <h1 className="text-3xl font-serif text-rose-50 tracking-tight">Matches</h1>
             <p className="text-rose-100/40 text-xs mt-1">
-              Interesses recíprocos aprovados pela curadoria.
+              Interesses recÃ­procos aprovados pela curadoria.
             </p>
           </div>
           <button
@@ -115,7 +115,7 @@ export default function Matches({
                         {like.otherUser?.full_name}
                       </h3>
                       <p className="text-[10px] text-rose-100/40 truncate w-full mt-0.5">
-                        {like.otherUser?.city || 'Cidade não informada'}
+                        {like.otherUser?.city || 'Cidade nÃ£o informada'}
                       </p>
                       <button
                         type="button"
@@ -133,9 +133,8 @@ export default function Matches({
               <button
                 type="button"
                 onClick={onOpenPlans}
-                className="w-full rounded-3xl border border-rose-900/40 bg-gradient-to-br from-rose-950/50 to-white/[0.02] p-5 text-left relative overflow-hidden"
+                className="w-full rounded-3xl border border-rose-900/40 bg-[#1a0205] p-5 text-left relative overflow-hidden"
               >
-                <div className="absolute -right-6 -top-8 w-32 h-32 rounded-full bg-rose-600/10 blur-2xl" />
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 rounded-full bg-rose-950/70 border border-rose-800/30 flex items-center justify-center">
                     <Lock size={15} className="text-rose-300" />
@@ -146,7 +145,7 @@ export default function Matches({
                     </p>
                     <p className="text-sm text-rose-50">
                       {likes.length}{' '}
-                      {likes.length === 1 ? 'pessoa curtiu' : 'pessoas curtiram'} você
+                      {likes.length === 1 ? 'pessoa curtiu' : 'pessoas curtiram'} vocÃª
                     </p>
                   </div>
                 </div>
@@ -181,8 +180,8 @@ export default function Matches({
         ) : matches.length === 0 ? (
           <EmptyState
             icon={Heart}
-            title="Seus matches vão aparecer aqui"
-            description="Quando você e outra pessoa demonstrarem interesse recíproco, o match é criado e a conversa é liberada."
+            title="Seus matches vÃ£o aparecer aqui"
+            description="Quando vocÃª e outra pessoa demonstrarem interesse recÃ­proco, o match Ã© criado e a conversa Ã© liberada."
             actionLabel="Descobrir pessoas"
             onAction={onGoExplore}
           />
@@ -207,14 +206,14 @@ export default function Matches({
                       <ChevronRight size={16} className="text-rose-100/25 shrink-0" />
                     </div>
                     <p className="text-[11px] text-rose-100/40 truncate mt-0.5">
-                      {other.city || 'Cidade não informada'}
+                      {other.city || 'Cidade nÃ£o informada'}
                     </p>
                     <div className="flex items-center gap-1.5 mt-2">
                       <Sparkles size={11} className="text-rose-400/70 shrink-0" />
                       <p className="text-[11px] text-rose-100/50 truncate">
                         {match.lastMessage
                           ? match.lastMessage.content
-                          : 'Vocês deram match. Comece a conversa.'}
+                          : 'VocÃªs deram match. Comece a conversa.'}
                       </p>
                     </div>
                   </div>
@@ -232,7 +231,7 @@ export default function Matches({
 
             {planState.subscription && (
               <p className="text-center text-[10px] text-rose-100/25 pt-2">
-                Plano {planState.plan?.name || 'selecionado'} ·{' '}
+                Plano {planState.plan?.name || 'selecionado'} Â·{' '}
                 {planState.subscription.status === 'active'
                   ? 'ativo'
                   : 'aguardando pagamento'}

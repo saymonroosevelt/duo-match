@@ -39,7 +39,7 @@ export default function Avatar({
 
   return (
     <div
-      className={`${base} bg-gradient-to-br from-rose-900 via-[#3a1018] to-black flex items-center justify-center font-serif text-rose-100/90`}
+      className={`${base} bg-[#3a1018] flex items-center justify-center font-serif text-rose-100/90`}
       aria-label={name || 'Sem foto'}
     >
       {initials(name)}

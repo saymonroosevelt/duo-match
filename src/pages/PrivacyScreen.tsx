@@ -50,7 +50,7 @@ export default function PrivacyScreen({
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user) throw new Error('Sessão expirada. Entre novamente.');
+      if (!user) throw new Error('SessÃ£o expirada. Entre novamente.');
 
       const [{ data: profile }, { data: matchRows }, { data: subscriptionRows }] =
         await Promise.all([
@@ -103,7 +103,7 @@ export default function PrivacyScreen({
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordMessage('As senhas não coincidem.');
+      setPasswordMessage('As senhas nÃ£o coincidem.');
       return;
     }
 
@@ -144,8 +144,8 @@ export default function PrivacyScreen({
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}>
-      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0a0000]/90 backdrop-blur-xl">
+    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: '#0f0a0d' }}>
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0f0a0d]">
         <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
           <BackButton onClick={goBack} />
           <h1 className="text-xl font-serif text-rose-50">
@@ -191,8 +191,8 @@ export default function PrivacyScreen({
                 </h2>
               </div>
               <p className="text-xs text-rose-100/50 leading-relaxed mb-4">
-                Você pode baixar uma cópia dos seus dados ou solicitar a exclusão
-                definitiva da conta. A exclusão remove perfil, matches e mensagens.
+                VocÃª pode baixar uma cÃ³pia dos seus dados ou solicitar a exclusÃ£o
+                definitiva da conta. A exclusÃ£o remove perfil, matches e mensagens.
               </p>
               <div className="flex flex-col gap-2">
                 <button
@@ -222,7 +222,7 @@ export default function PrivacyScreen({
               <div className="flex items-center gap-2 mb-3">
                 <KeyRound size={15} className="text-rose-300/80" />
                 <h2 className="text-[10px] uppercase tracking-[0.2em] text-rose-100/45">
-                  Segurança
+                  SeguranÃ§a
                 </h2>
               </div>
               <form onSubmit={changePassword} className="space-y-2.5">
@@ -310,8 +310,8 @@ export default function PrivacyScreen({
               </button>
             </div>
             <p className="text-xs text-rose-100/50 leading-relaxed mb-4">
-              Esta ação é definitiva. Perfil, foto, matches e mensagens serão
-              removidos. Não será possível recuperar a conta.
+              Esta aÃ§Ã£o Ã© definitiva. Perfil, foto, matches e mensagens serÃ£o
+              removidos. NÃ£o serÃ¡ possÃ­vel recuperar a conta.
             </p>
             <p className="text-[10px] uppercase tracking-widest text-rose-100/35 mb-2">
               Digite EXCLUIR para confirmar
@@ -357,25 +357,25 @@ function PrivacyText() {
     <article className="space-y-6 text-rose-100/55">
       <LegalHeader
         icon={Shield}
-        title="Política de Privacidade"
-        subtitle="Última atualização: 08 de novembro de 2026"
+        title="PolÃ­tica de Privacidade"
+        subtitle="Ãšltima atualizaÃ§Ã£o: 08 de novembro de 2026"
       />
 
       <LegalSection title="1. Quem trata seus dados">
         <p>
-          O Duo Match é responsável pelo tratamento dos dados pessoais informados
+          O Duo Match Ã© responsÃ¡vel pelo tratamento dos dados pessoais informados
           nesta plataforma. Encarregado de dados: privacidade@duomatch.app.
         </p>
       </LegalSection>
 
       <LegalSection title="2. Dados que coletamos">
         <p>
-          Nome, idade, cidade, bio, foto, intenção de relacionamento, interesses,
-          valores, e-mail, mensagens trocadas, registros de acesso e informações
-          necessárias para segurança e curadoria.
+          Nome, idade, cidade, bio, foto, intenÃ§Ã£o de relacionamento, interesses,
+          valores, e-mail, mensagens trocadas, registros de acesso e informaÃ§Ãµes
+          necessÃ¡rias para seguranÃ§a e curadoria.
         </p>
         <p>
-          Não coletamos dados sensíveis além daqueles que você escolher informar
+          NÃ£o coletamos dados sensÃ­veis alÃ©m daqueles que vocÃª escolher informar
           voluntariamente na sua bio ou nas conversas.
         </p>
       </LegalSection>
@@ -385,57 +385,57 @@ function PrivacyText() {
           <li>Criar e exibir seu perfil para outros membros aprovados.</li>
           <li>Realizar a curadoria manual de perfis.</li>
           <li>Calcular matches e permitir conversas.</li>
-          <li>Prevenir fraude, assédio e uso indevido.</li>
-          <li>Enviar comunicações essenciais sobre a conta.</li>
+          <li>Prevenir fraude, assÃ©dio e uso indevido.</li>
+          <li>Enviar comunicaÃ§Ãµes essenciais sobre a conta.</li>
         </ul>
       </LegalSection>
 
       <LegalSection title="4. Bases legais (LGPD)">
         <p>
-          Consentimento (art. 7º, I) para a criação do perfil e participação na
-          comunidade; execução de contrato (art. 7º, V) para a prestação do
-          serviço; legítimo interesse (art. 7º, IX) para segurança e prevenção a
-          fraudes; e cumprimento de obrigação legal quando aplicável.
+          Consentimento (art. 7Âº, I) para a criaÃ§Ã£o do perfil e participaÃ§Ã£o na
+          comunidade; execuÃ§Ã£o de contrato (art. 7Âº, V) para a prestaÃ§Ã£o do
+          serviÃ§o; legÃ­timo interesse (art. 7Âº, IX) para seguranÃ§a e prevenÃ§Ã£o a
+          fraudes; e cumprimento de obrigaÃ§Ã£o legal quando aplicÃ¡vel.
         </p>
       </LegalSection>
 
       <LegalSection title="5. Compartilhamento">
         <p>
-          Usamos a infraestrutura do Supabase para autenticação, banco de dados e
-          armazenamento de fotos. Não vendemos seus dados. O acesso administrativo
-          é restrito à equipe de curadoria e protegido por políticas de segurança.
+          Usamos a infraestrutura do Supabase para autenticaÃ§Ã£o, banco de dados e
+          armazenamento de fotos. NÃ£o vendemos seus dados. O acesso administrativo
+          Ã© restrito Ã  equipe de curadoria e protegido por polÃ­ticas de seguranÃ§a.
         </p>
       </LegalSection>
 
-      <LegalSection title="6. Retenção e exclusão">
+      <LegalSection title="6. RetenÃ§Ã£o e exclusÃ£o">
         <p>
-          Seus dados ficam armazenados enquanto sua conta estiver ativa. Você pode
-          excluir a conta a qualquer momento nesta tela. A exclusão remove perfil,
+          Seus dados ficam armazenados enquanto sua conta estiver ativa. VocÃª pode
+          excluir a conta a qualquer momento nesta tela. A exclusÃ£o remove perfil,
           foto, matches e mensagens, ressalvados registros exigidos por lei.
         </p>
       </LegalSection>
 
       <LegalSection title="7. Seus direitos">
         <p>
-          Você pode solicitar acesso, correção, portabilidade, anonimização,
-          bloqueio ou eliminação dos dados, além de revogar o consentimento. Use
-          a exportação de dados ou fale com privacidade@duomatch.app.
+          VocÃª pode solicitar acesso, correÃ§Ã£o, portabilidade, anonimizaÃ§Ã£o,
+          bloqueio ou eliminaÃ§Ã£o dos dados, alÃ©m de revogar o consentimento. Use
+          a exportaÃ§Ã£o de dados ou fale com privacidade@duomatch.app.
         </p>
       </LegalSection>
 
-      <LegalSection title="8. Segurança">
+      <LegalSection title="8. SeguranÃ§a">
         <p>
-          Aplicamos Row Level Security no banco, transmissão criptografada,
-          políticas de acesso por perfil e restrição de funções administrativas.
-          Nenhum sistema é 100% imune; em caso de incidente, comunicaremos os
+          Aplicamos Row Level Security no banco, transmissÃ£o criptografada,
+          polÃ­ticas de acesso por perfil e restriÃ§Ã£o de funÃ§Ãµes administrativas.
+          Nenhum sistema Ã© 100% imune; em caso de incidente, comunicaremos os
           titulares afetados conforme a LGPD.
         </p>
       </LegalSection>
 
       <LegalSection title="9. Cookies e armazenamento local">
         <p>
-          Utilizamos armazenamento local apenas para manter a sessão autenticada e
-          preferências básicas do aplicativo. Não usamos cookies de publicidade.
+          Utilizamos armazenamento local apenas para manter a sessÃ£o autenticada e
+          preferÃªncias bÃ¡sicas do aplicativo. NÃ£o usamos cookies de publicidade.
         </p>
       </LegalSection>
     </article>
@@ -448,70 +448,70 @@ function TermsText() {
       <LegalHeader
         icon={CheckCircle2}
         title="Termos de Uso"
-        subtitle="Última atualização: 08 de novembro de 2026"
+        subtitle="Ãšltima atualizaÃ§Ã£o: 08 de novembro de 2026"
       />
 
       <LegalSection title="1. Elegibilidade">
         <p>
-          O Duo Match é destinado a pessoas maiores de 18 anos. Ao criar a conta,
-          você declara que as informações fornecidas são verdadeiras e que possui
+          O Duo Match Ã© destinado a pessoas maiores de 18 anos. Ao criar a conta,
+          vocÃª declara que as informaÃ§Ãµes fornecidas sÃ£o verdadeiras e que possui
           capacidade legal para celebrar este acordo.
         </p>
       </LegalSection>
 
       <LegalSection title="2. Curadoria e acesso">
         <p>
-          Todo perfil passa por análise manual. A aprovação não é automática e
-          pode ser recusada ou revista para proteger a qualidade e a segurança da
-          comunidade. O acesso às áreas de membros só existe após a aprovação.
+          Todo perfil passa por anÃ¡lise manual. A aprovaÃ§Ã£o nÃ£o Ã© automÃ¡tica e
+          pode ser recusada ou revista para proteger a qualidade e a seguranÃ§a da
+          comunidade. O acesso Ã s Ã¡reas de membros sÃ³ existe apÃ³s a aprovaÃ§Ã£o.
         </p>
       </LegalSection>
 
       <LegalSection title="3. Conduta">
         <ul className="list-disc pl-5 space-y-1.5">
-          <li>Não criar perfis falsos, duplicados ou de terceiros.</li>
-          <li>Não praticar assédio, discriminação, ameaça ou violência.</li>
-          <li>Não enviar conteúdo sexual explícito sem consentimento.</li>
-          <li>Não usar a plataforma para spam, golpes ou fins comerciais.</li>
+          <li>NÃ£o criar perfis falsos, duplicados ou de terceiros.</li>
+          <li>NÃ£o praticar assÃ©dio, discriminaÃ§Ã£o, ameaÃ§a ou violÃªncia.</li>
+          <li>NÃ£o enviar conteÃºdo sexual explÃ­cito sem consentimento.</li>
+          <li>NÃ£o usar a plataforma para spam, golpes ou fins comerciais.</li>
           <li>Respeitar a privacidade e as escolhas das outras pessoas.</li>
         </ul>
       </LegalSection>
 
-      <LegalSection title="4. Conteúdo">
+      <LegalSection title="4. ConteÃºdo">
         <p>
-          Você mantém a titularidade do conteúdo que publica e concede ao Duo Match
-          uma licença limitada para exibi-lo dentro da plataforma. Podemos remover
-          conteúdo que viole estes termos ou a lei.
+          VocÃª mantÃ©m a titularidade do conteÃºdo que publica e concede ao Duo Match
+          uma licenÃ§a limitada para exibi-lo dentro da plataforma. Podemos remover
+          conteÃºdo que viole estes termos ou a lei.
         </p>
       </LegalSection>
 
       <LegalSection title="5. Planos e pagamento">
         <p>
-          A plataforma apresenta o plano Duo Match. Nesta versão, o
-          pagamento ainda não está habilitado e nenhuma cobrança é realizada. A
-          seleção de plano não ativa uma assinatura paga.
+          A plataforma apresenta o plano Duo Match. Nesta versÃ£o, o
+          pagamento ainda nÃ£o estÃ¡ habilitado e nenhuma cobranÃ§a Ã© realizada. A
+          seleÃ§Ã£o de plano nÃ£o ativa uma assinatura paga.
         </p>
       </LegalSection>
 
-      <LegalSection title="6. Suspensão e encerramento">
+      <LegalSection title="6. SuspensÃ£o e encerramento">
         <p>
-          Podemos suspender ou encerrar contas que violem estes termos, após
-          análise da curadoria. Você pode encerrar sua conta a qualquer momento na
+          Podemos suspender ou encerrar contas que violem estes termos, apÃ³s
+          anÃ¡lise da curadoria. VocÃª pode encerrar sua conta a qualquer momento na
           tela de Privacidade e dados.
         </p>
       </LegalSection>
 
-      <LegalSection title="7. Limitação de responsabilidade">
+      <LegalSection title="7. LimitaÃ§Ã£o de responsabilidade">
         <p>
-          O Duo Match facilita conexões, mas não garante compatibilidade, encontros
-          presenciais ou resultados. Use bom senso e segurança ao interagir com
+          O Duo Match facilita conexÃµes, mas nÃ£o garante compatibilidade, encontros
+          presenciais ou resultados. Use bom senso e seguranÃ§a ao interagir com
           outras pessoas, especialmente fora da plataforma.
         </p>
       </LegalSection>
 
       <LegalSection title="8. Contato">
         <p>
-          Dúvidas sobre estes termos: suporte@duomatch.app. Privacidade e dados:
+          DÃºvidas sobre estes termos: suporte@duomatch.app. Privacidade e dados:
           privacidade@duomatch.app.
         </p>
       </LegalSection>

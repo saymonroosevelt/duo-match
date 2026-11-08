@@ -110,7 +110,7 @@ function App() {
       active = false;
       subscription.unsubscribe();
     };
-    // O perfil é lido apenas na troca de sessão; edições usam refreshProfile.
+    // O perfil Ã© lido apenas na troca de sessÃ£o; ediÃ§Ãµes usam refreshProfile.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProfile]);
 
@@ -135,7 +135,7 @@ function App() {
     return (
       <div
         className="min-h-screen bg-[#0a0000] text-white flex items-center justify-center font-serif tracking-widest"
-        style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}
+        style={{ background: '#0f0a0d' }}
         aria-hidden="true"
       />
     );
@@ -206,7 +206,7 @@ function App() {
     );
   }
 
-  // Telas sobrepostas (planos, privacidade, edição, comunidades, admin)
+  // Telas sobrepostas (planos, privacidade, ediÃ§Ã£o, comunidades, admin)
   if (overlay) {
     if (overlay === 'interests') {
       return (
@@ -301,9 +301,9 @@ function App() {
   return (
     <div
       className="font-sans antialiased bg-[#0F0F10] min-h-screen text-white"
-style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}
+style={{ background: '#0f0a0d' }}
     >
-      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#0F0F10]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#0f0a0d]">
         <div className="max-w-md mx-auto px-5 h-16 flex items-center justify-between gap-4">
           <button
             type="button"
@@ -345,7 +345,7 @@ style={{ background: 'linear-gradient(135deg, #1f0408 0%, #0d0103 100%)' }}
 
       <main className="pb-20">{renderTab()}</main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.07] bg-[#0a0000]/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.07] bg-[#0f0a0d] pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-md mx-auto flex justify-around px-2 py-2">
           <TabButton
             icon={Compass}
@@ -417,7 +417,7 @@ function AdminDenied() {
       </div>
       <h1 className="text-3xl font-serif text-rose-50 mb-2">Acesso restrito</h1>
       <p className="text-sm text-rose-100/45 max-w-xs leading-relaxed mb-7">
-        Esta área é exclusiva da equipe de curadoria do Duo Match.
+        Esta Ã¡rea Ã© exclusiva da equipe de curadoria do Duo Match.
       </p>
       <button
         type="button"
