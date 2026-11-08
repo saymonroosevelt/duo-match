@@ -14,7 +14,7 @@ export default function Toast({ toast, onClose }) {
   const Icon = isError ? AlertCircle : CheckCircle2;
 
   return (
-    <div className="fixed left-1/2 -translate-x-1/2 bottom-24 z-[120] w-[calc(100%-2rem)] max-w-sm animate-slide-up">
+    <div className="fixed left-1/2 -translate-x-1/2 bottom-28 z-[120] w-[calc(100%-2rem)] max-w-sm animate-slide-up">
       <div
         className={`flex items-start gap-3 rounded-2xl border px-4 py-3 shadow-2xl backdrop-blur-xl ${
           isError

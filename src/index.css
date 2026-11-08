@@ -105,3 +105,13 @@ select:-webkit-autofill {
 .object-cover {
   object-position: center;
 }
+
+/* Espaço seguro acima do rodapé fixo + safe-area do Android/iOS */
+.pb-nav {
+  padding-bottom: calc(6.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Utilitário para safe-area (barra de gestos / botões do Android) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
