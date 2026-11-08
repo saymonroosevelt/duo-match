@@ -24,6 +24,29 @@ import EditProfile from './pages/EditProfile';
 import PlansScreen from './pages/PlansScreen';
 import PrivacyScreen from './pages/PrivacyScreen';
 
+// Dedupe global: o mesmo userId nunca dispara 2 queries de perfil em paralelo
+// (getSession + evento SIGNED_IN chegavam juntos e duplicavam a espera).
+const profileRequests = new Map();
+
+function fetchProfileOnce(userId) {
+  if (!profileRequests.has(userId)) {
+    const req = supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Erro ao carregar perfil:', error.message);
+        }
+        return data ?? null;
+      })
+      .finally(() => profileRequests.delete(userId));
+    profileRequests.set(userId, req);
+  }
+  return profileRequests.get(userId);
+}
+
 function App() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -39,19 +62,7 @@ function App() {
   const isAdminRoute = params.get('admin') === 'true';
   const isLegalRoute = params.get('legal') === '1' || params.get('legal') === 'true';
 
-  const fetchProfile = useCallback(async (userId) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Erro ao carregar perfil:', error.message);
-    }
-
-    return data ?? null;
-  }, []);
+  const fetchProfile = useCallback((userId) => fetchProfileOnce(userId), []);
 
   useEffect(() => {
     let active = true;
@@ -81,6 +92,8 @@ function App() {
       }
 
       lastSessionId = nextSession.user.id;
+      // Splash visível enquanto o perfil é buscado — nunca mais tela preta.
+      setLoading(true);
       const nextProfile = await fetchProfile(nextSession.user.id);
 
       if (!active) return;
@@ -134,10 +147,23 @@ function App() {
   if (loading) {
     return (
       <div
-        className="min-h-screen text-white flex items-center justify-center font-serif tracking-widest"
-       
-        aria-hidden="true"
-      />
+        className="min-h-screen text-[#f8e3d8] flex flex-col items-center justify-center gap-5"
+        role="status"
+        aria-label="Carregando o Duo Match"
+      >
+        <Heart
+          size={64}
+          strokeWidth={1.6}
+          className="text-rose-200/90 animate-pulse"
+          fill="rgba(244,236,232,0.12)"
+        />
+        <span className="font-logo italic text-5xl leading-none tracking-[-0.04em]">
+          match
+        </span>
+        <span className="text-[11px] uppercase tracking-[0.3em] text-[#e8cbc4]/60">
+          Carregando
+        </span>
+      </div>
     );
   }
 
