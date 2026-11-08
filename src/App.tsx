@@ -59,7 +59,7 @@ function App() {
   };
 
   return (
-    <div className="font-sans text-white min-h-screen bg-[#0F0F10] pb-24">
+    <div className="font-sans text-white min-h-screen pb-24">
       <main>{renderContent()}</main>
 
       {showNav && (

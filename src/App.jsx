@@ -134,8 +134,8 @@ function App() {
   if (loading) {
     return (
       <div
-        className="min-h-screen bg-[#0a0000] text-white flex items-center justify-center font-serif tracking-widest"
-        style={{ background: '#0f0a0d' }}
+        className="min-h-screen text-white flex items-center justify-center font-serif tracking-widest"
+       
         aria-hidden="true"
       />
     );
@@ -300,10 +300,9 @@ function App() {
 
   return (
     <div
-      className="font-sans antialiased bg-[#0F0F10] min-h-screen text-white"
-style={{ background: '#0f0a0d' }}
+      className="font-sans antialiased min-h-screen text-white"
     >
-      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#0f0a0d]">
+      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#150408]">
         <div className="max-w-md mx-auto px-5 h-16 flex items-center justify-between gap-4">
           <button
             type="button"
@@ -345,7 +344,7 @@ style={{ background: '#0f0a0d' }}
 
       <main className="pb-20">{renderTab()}</main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.07] bg-[#0f0a0d] pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.07] bg-[#150408] pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-md mx-auto flex justify-around px-2 py-2">
           <TabButton
             icon={Compass}
@@ -411,7 +410,7 @@ function TabButton({ icon: Icon, label, active, onClick }) {
 
 function AdminDenied() {
   return (
-    <div className="min-h-screen bg-[#0a0000] text-white flex flex-col items-center justify-center p-6 text-center">
+    <div className="min-h-screen text-white flex flex-col items-center justify-center p-6 text-center">
       <div className="w-16 h-16 rounded-full border border-red-900/30 bg-red-950/20 flex items-center justify-center mb-5">
         <ShieldAlert size={26} className="text-red-300/70" />
       </div>

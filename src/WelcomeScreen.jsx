@@ -1,6 +1,6 @@
 export default function WelcomeScreen({ onStart, onEnterAccount }) {
   return (
-    <main className="relative min-h-[100dvh] w-full bg-[#0f0a0d] text-[#f8e3d8]">
+    <main className="relative min-h-[100dvh] w-full bg-transparent text-[#f8e3d8]">
       <div
         className="relative z-10 flex min-h-[100dvh] flex-col items-center px-8"
         style={{

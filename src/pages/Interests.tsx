@@ -10,8 +10,8 @@ export default function Interests({
   onSelectInterest?: (interest: string) => void;
 }) {
   return (
-    <div className="min-h-[100dvh] bg-[#0F0F10] text-white" style={{ background: '#0f0a0d' }}>
-      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0f0a0d]">
+    <div className="min-h-[100dvh] text-white">
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#150408]">
         <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
           {onBack ? <BackButton onClick={onBack} /> : <div className="w-16" />}
           <h1 className="text-xl font-serif text-rose-50">Interesses</h1>

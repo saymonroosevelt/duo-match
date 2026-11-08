@@ -118,7 +118,7 @@ export default function OnboardingScreen({ session }) {
 
   if (saved) {
     return (
-      <div className="min-h-[100dvh] bg-[#0a0000] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{ background: '#0f0a0d' }}>
+      <div className="min-h-[100dvh] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
         <div className="relative z-10 max-w-sm w-full text-center">
           <div className="w-20 h-20 rounded-full border border-emerald-700/30 bg-emerald-950/30 flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={36} className="text-emerald-300/80" />
@@ -146,7 +146,7 @@ export default function OnboardingScreen({ session }) {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white p-6 flex flex-col relative overflow-hidden" style={{ background: '#0f0a0d' }}>
+    <div className="min-h-[100dvh] text-white p-6 flex flex-col relative overflow-hidden">
 
       <div className="flex items-center justify-between mb-5 z-10 pt-2">
         {step > 1 ? (

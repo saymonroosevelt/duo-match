@@ -8,7 +8,7 @@ export default function RejectedApproval() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{ background: '#0f0a0d' }}>
+    <div className="min-h-[100dvh] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
 
       <div className="relative z-10 max-w-sm w-full text-center">
         <div className="w-20 h-20 rounded-full border border-red-900/30 bg-red-950/30 flex items-center justify-center mx-auto mb-6">

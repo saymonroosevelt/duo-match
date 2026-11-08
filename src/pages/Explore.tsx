@@ -293,7 +293,7 @@ export default function Explore({
   const allSeen = !loading && profiles.length > 0 && index >= profiles.length;
 
   return (
-    <div className="min-h-full bg-[#0F0F10] text-white px-4 pt-4 pb-6" style={{ background: '#0f0a0d' }}>
+    <div className="min-h-full text-white px-4 pt-4 pb-6">
       <div className="max-w-md mx-auto w-full flex items-start justify-between gap-4 mb-4">
         <div>
           <h1 className="text-3xl font-serif text-rose-50 tracking-tight">Descobrir</h1>

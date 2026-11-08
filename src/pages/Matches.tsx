@@ -59,7 +59,7 @@ export default function Matches({
   }
 
   return (
-    <div className="min-h-full bg-[#0F0F10] text-white px-5 pt-5 pb-8" style={{ background: '#0f0a0d' }}>
+    <div className="min-h-full text-white px-5 pt-5 pb-8">
       <div className="max-w-md mx-auto">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>

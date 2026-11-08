@@ -8,7 +8,7 @@ export default function PendingApproval() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{ background: '#0f0a0d' }}>
+    <div className="min-h-[100dvh] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
 
       <div className="relative z-10 max-w-sm w-full">
         <div className="flex justify-center mb-6">

@@ -126,7 +126,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
   }
 
   return (
-    <main className="min-h-[100dvh] bg-[#0a0000] text-white p-6 flex flex-col relative overflow-hidden" style={{ background: '#0f0a0d' }}>
+    <main className="min-h-[100dvh] text-white p-6 flex flex-col relative overflow-hidden">
 
       <button
         type="button"

@@ -248,8 +248,8 @@ export default function Chat({
   const interests = asArray(otherUser?.intentions);
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-[#0a0000] text-white" style={{ background: '#0f0a0d' }}>
-      <header className="shrink-0 border-b border-white/[0.07] bg-[#0f0a0d]">
+    <div className="flex flex-col h-[100dvh] text-white">
+      <header className="shrink-0 border-b border-white/[0.07] bg-[#150408]">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
           <button
             type="button"
@@ -445,7 +445,7 @@ export default function Chat({
       )}
 
       {blocked ? (
-        <div className="shrink-0 border-t border-white/[0.07] bg-[#0F0F10] px-5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+        <div className="shrink-0 border-t border-white/[0.07] bg-[#150408] px-5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
           <div className="max-w-md mx-auto text-center">
             <Lock size={20} className="text-rose-300/70 mx-auto mb-2" />
             <p className="text-sm text-rose-100/60">
@@ -467,7 +467,7 @@ export default function Chat({
       ) : (
         <form
           onSubmit={handleSend}
-          className="shrink-0 border-t border-white/[0.07] bg-[#0F0F10] px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
+          className="shrink-0 border-t border-white/[0.07] bg-[#150408] px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
         >
           <div className="max-w-md mx-auto flex items-center gap-2">
             <input

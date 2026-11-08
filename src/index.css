@@ -10,27 +10,40 @@
   --bg-dark: #0F0F10;
   --bg-ink: #0a0000;
   --card-dark: #1C1C1E;
-  --bg-solid: #0f0a0d;
+  --bg-solid: #150409;
   color-scheme: dark;
 }
 
 html {
   min-height: 100%;
-  background-color: #0f0a0d;
+  background-color: #120306;
   -webkit-tap-highlight-color: transparent;
 }
 
 body,
 #root {
   min-height: 100vh;
-  background-color: #0f0a0d;
 }
 
+/*
+  Fundo "vinho rico" — estático, elegante e profundo.
+  Camadas (sem animação, sem ondas, sem imagem):
+  1) luz ambiente de vinho no topo central
+  2) brilho sutil na base
+  3) gradiente diagonal profundo vinho → quase preto
+*/
 body {
   margin: 0;
   font-family: Georgia, 'Times New Roman', 'Times', 'Apple Garamond', serif;
-  background-color: #0f0a0d;
-  color: white;
+  background-color: #150409;
+  background-image:
+    radial-gradient(130% 95% at 50% -18%, rgba(139, 45, 66, 0.55) 0%, rgba(87, 22, 36, 0.35) 34%, rgba(36, 8, 16, 0) 68%),
+    radial-gradient(120% 85% at 50% 115%, rgba(78, 18, 32, 0.45) 0%, rgba(30, 6, 14, 0.22) 45%, rgba(0, 0, 0, 0) 75%),
+    linear-gradient(172deg, #2a0a12 0%, #1e060d 30%, #170408 56%, #110205 82%, #0c0103 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  color: #f5ede9;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -61,8 +74,9 @@ button {
   color: #fff;
 }
 
+/* Alias legado — agora herda o fundo global (sem cor chapada) */
 .bg-wine-gradient {
-  background-color: #0f0a0d;
+  background-color: transparent;
 }
 
 .nav-shadow {

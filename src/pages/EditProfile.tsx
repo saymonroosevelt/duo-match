@@ -129,8 +129,8 @@ export default function EditProfile({
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0000] text-white" style={{ background: '#0f0a0d' }}>
-      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#0f0a0d]">
+    <div className="min-h-[100dvh] text-white">
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#150408]">
         <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
           <BackButton onClick={onBack} />
           <h1 className="text-xl font-serif text-rose-50">Editar perfil</h1>
@@ -298,7 +298,7 @@ export default function EditProfile({
         )}
       </form>
 
-      <div className="fixed bottom-0 left-0 right-0 border-t border-white/[0.07] bg-[#0f0a0d] px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-white/[0.07] bg-[#150408] px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <div className="max-w-md mx-auto">
           <button
             type="button"
