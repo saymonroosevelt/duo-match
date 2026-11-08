@@ -1,0 +1,91 @@
+/* Fontes do sistema — sem dependência externa (evita bloqueio/tela preta) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --wine-dark: #2A050A;
+  --wine-primary: #4A0E0E;
+  --wine-bright: #E11D48;
+  --bg-dark: #0F0F10;
+  --bg-ink: #0a0000;
+  --card-dark: #1C1C1E;
+  color-scheme: dark;
+}
+
+html {
+  min-height: 100%;
+  background: linear-gradient(135deg, #1f0408 0%, #0d0103 100%);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', 'Times', 'Apple Garamond', serif;
+  background: linear-gradient(135deg, #1f0408 0%, #0d0103 100%);
+  color: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+.font-serif {
+  font-family: Georgia, 'Times New Roman', 'Times', 'Apple Garamond', serif;
+}
+
+.font-logo {
+  font-family: Georgia, 'Times New Roman', 'Times', 'Apple Garamond', serif;
+  font-style: italic;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(225, 29, 72, 0.35);
+  color: #fff;
+}
+
+.bg-wine-gradient {
+  background: linear-gradient(180deg, #580B14 0%, #2A050A 100%);
+}
+
+.nav-shadow {
+  box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Scrollbar invisível mas funcional para mobile */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mantém o texto legível mesmo quando o navegador preenche os campos automaticamente */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #f5f5f4;
+  -webkit-box-shadow: 0 0 0 1000px #111827 inset;
+  box-shadow: 0 0 0 1000px #111827 inset;
+  caret-color: #f5f5f4;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Deixa o vídeo/imagem sempre cobrindo o card */
+.object-cover {
+  object-position: center;
+}
