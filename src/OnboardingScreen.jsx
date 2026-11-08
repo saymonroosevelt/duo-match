@@ -82,7 +82,7 @@ export default function OnboardingScreen({ session }) {
       return;
     }
     if (!formData.relationship_intention) {
-      setError('Escolha o que vocÃª estÃ¡ procurando construir.');
+      setError('Escolha o que você está procurando construir.');
       return;
     }
     if (formData.interests.length === 0) {
@@ -138,7 +138,7 @@ export default function OnboardingScreen({ session }) {
             <RefreshCw size={15} /> Verificar status
           </button>
           <p className="text-[10px] text-rose-100/25 mt-5 leading-relaxed">
-            NÃ£o Ã© necessÃ¡rio pagar para participar da curadoria.
+            Não é necessário pagar para participar da curadoria.
           </p>
         </div>
       </div>
@@ -185,9 +185,9 @@ export default function OnboardingScreen({ session }) {
         {step === 1 && (
           <div className="animate-fade-in flex flex-col gap-5">
             <div>
-              <h2 className="text-3xl font-serif mb-1 text-rose-50">Quem Ã© vocÃª?</h2>
+              <h2 className="text-3xl font-serif mb-1 text-rose-50">Quem é você?</h2>
               <p className="text-sm text-rose-100/45">
-                Essas informaÃ§Ãµes ajudam a curadoria a entender seu perfil.
+                Essas informações ajudam a curadoria a entender seu perfil.
               </p>
             </div>
 
@@ -220,7 +220,7 @@ export default function OnboardingScreen({ session }) {
                 />
               </div>
               <p className="text-[10px] text-rose-100/25 mt-2">
-                Foto opcional Â· pode adicionar depois
+                Foto opcional · pode adicionar depois
               </p>
               {photoWarning && (
                 <p className="text-[10px] text-amber-300/60 mt-1 text-center max-w-[280px]">
@@ -260,14 +260,14 @@ export default function OnboardingScreen({ session }) {
                   value={formData.city}
                   onChange={(event) => updateForm('city', event.target.value)}
                   className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] p-4 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-rose-500/50"
-                  placeholder="FlorianÃ³polis, SC"
+                  placeholder="Florianópolis, SC"
                 />
               </label>
             </div>
 
             <label className="block">
               <span className="text-xs text-rose-100/55 ml-1">
-                Sobre vocÃª (opcional)
+                Sobre você (opcional)
               </span>
               <textarea
                 value={formData.bio}
@@ -297,10 +297,10 @@ export default function OnboardingScreen({ session }) {
           <div className="animate-fade-in flex flex-col gap-5">
             <div>
               <h2 className="text-3xl font-serif mb-1 text-rose-50">
-                O que vocÃª estÃ¡ procurando construir?
+                O que você está procurando construir?
               </h2>
               <p className="text-sm text-rose-100/45">
-                Escolha a intenÃ§Ã£o que mais representa vocÃª agora.
+                Escolha a intenção que mais representa você agora.
               </p>
             </div>
 
@@ -345,7 +345,7 @@ export default function OnboardingScreen({ session }) {
                 Explore por interesses
               </h2>
               <p className="text-sm text-rose-100/45">
-                Selecione o que mais combina com vocÃª. Isso ajuda nos matches e nas
+                Selecione o que mais combina com você. Isso ajuda nos matches e nas
                 comunidades.
               </p>
             </div>
@@ -392,8 +392,8 @@ export default function OnboardingScreen({ session }) {
             </button>
 
             <p className="text-[10px] text-center text-rose-100/25 leading-relaxed">
-              Ao finalizar, seu perfil entra na fila de curadoria. O acesso sÃ³ Ã©
-              liberado apÃ³s a aprovaÃ§Ã£o.
+              Ao finalizar, seu perfil entra na fila de curadoria. O acesso só é
+              liberado após a aprovação.
             </p>
           </div>
         )}

@@ -164,7 +164,7 @@ export default function EditProfile({
             />
           </div>
           <p className="text-[10px] text-rose-100/30 mt-3 text-center">
-            Foto pÃºblica para membros aprovados Â· atÃ© 5 MB
+            Foto pública para membros aprovados · até 5 MB
           </p>
           {form.photo_url && (
             <button
@@ -206,20 +206,20 @@ export default function EditProfile({
                 value={form.city}
                 onChange={(event) => update('city', event.target.value)}
                 className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white focus:outline-none focus:border-rose-500/40"
-                placeholder="FlorianÃ³polis, SC"
+                placeholder="Florianópolis, SC"
               />
             </label>
           </div>
 
           <label className="block">
-            <span className="text-xs text-rose-100/55 ml-1">Sobre vocÃª</span>
+            <span className="text-xs text-rose-100/55 ml-1">Sobre você</span>
             <textarea
               value={form.bio}
               onChange={(event) => update('bio', event.target.value)}
               rows={4}
               maxLength={700}
               className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white placeholder:text-rose-100/25 focus:outline-none focus:border-rose-500/40 resize-none"
-              placeholder="Conte um pouco sobre vocÃª, sua rotina e o que valoriza."
+              placeholder="Conte um pouco sobre você, sua rotina e o que valoriza."
             />
             <span className="block text-right text-[9px] text-rose-100/25 mt-1">
               {form.bio.length}/700
@@ -227,7 +227,7 @@ export default function EditProfile({
           </label>
 
           <label className="block">
-            <span className="text-xs text-rose-100/55 ml-1">O que vocÃª busca</span>
+            <span className="text-xs text-rose-100/55 ml-1">O que você busca</span>
             <select
               value={form.what_procura}
               onChange={(event) => update('what_procura', event.target.value)}
@@ -267,7 +267,7 @@ export default function EditProfile({
 
           <div>
             <span className="text-xs text-rose-100/55 ml-1">
-              Valores inegociÃ¡veis
+              Valores inegociáveis
             </span>
             <div className="flex flex-wrap gap-2 mt-2">
               {VALUES_OPTIONS.map((value) => {
@@ -312,7 +312,7 @@ export default function EditProfile({
               </>
             ) : (
               <>
-                <Save size={16} /> Salvar alteraÃ§Ãµes
+                <Save size={16} /> Salvar alterações
               </>
             )}
           </button>

@@ -7,7 +7,7 @@ function translateAuthError(message) {
     return 'E-mail ou senha incorretos.';
   }
   if (/user already registered/i.test(message)) {
-    return 'Este e-mail jÃ¡ tem uma conta. Use "JÃ¡ tenho conta".';
+    return 'Este e-mail já tem uma conta. Use "Já tenho conta".';
   }
   if (/password should be at least/i.test(message)) {
     return 'A senha precisa ter pelo menos 6 caracteres.';
@@ -16,7 +16,7 @@ function translateAuthError(message) {
     return 'Confirme seu e-mail antes de entrar.';
   }
   if (/invalid email/i.test(message)) {
-    return 'Informe um e-mail vÃ¡lido.';
+    return 'Informe um e-mail válido.';
   }
   if (/rate limit/i.test(message)) {
     return 'Muitas tentativas. Aguarde alguns instantes e tente novamente.';
@@ -54,7 +54,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
       return;
     }
     if (!isLogin && !accepted) {
-      setMessage('Para criar a conta, aceite os Termos de Uso e a PolÃ­tica de Privacidade.');
+      setMessage('Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.');
       setMessageType('error');
       return;
     }
@@ -89,7 +89,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
         setMessage('Conta criada! Vamos completar seu perfil.');
       } else {
         setMessage(
-          'Conta criada! Enviamos um link de confirmaÃ§Ã£o para o seu e-mail. Depois de confirmar, volte e entre.',
+          'Conta criada! Enviamos um link de confirmação para o seu e-mail. Depois de confirmar, volte e entre.',
         );
       }
       setMessageType('success');
@@ -102,7 +102,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
   async function handleReset() {
     if (resetLoading) return;
     if (!email.trim()) {
-      setMessage('Digite seu e-mail para receber o link de recuperaÃ§Ã£o.');
+      setMessage('Digite seu e-mail para receber o link de recuperação.');
       setMessageType('error');
       return;
     }
@@ -120,7 +120,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
     }
 
     setMessage(
-      'Enviamos um link de recuperaÃ§Ã£o para o seu e-mail. Ao voltar, altere a senha em Perfil > Privacidade e dados.',
+      'Enviamos um link de recuperação para o seu e-mail. Ao voltar, altere a senha em Perfil > Privacidade e dados.',
     );
     setMessageType('success');
   }
@@ -151,8 +151,8 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
           <h2 className="text-3xl font-serif mb-2 text-rose-50">{initialMode === 'login' ? 'Entre na sua conta.' : 'Criar sua conta.'}</h2>
           <p className="text-sm text-rose-100/50 leading-relaxed">
             {initialMode === 'login'
-              ? 'Entre na sua conta. A curadoria aprova cada perfil antes de liberar o acesso Ã s conexÃµes.'
-              : 'Criar sua conta. A curadoria aprova cada perfil antes de liberar o acesso Ã s conexÃµes.'}
+              ? 'Entre na sua conta. A curadoria aprova cada perfil antes de liberar o acesso às conexões.'
+              : 'Criar sua conta. A curadoria aprova cada perfil antes de liberar o acesso às conexões.'}
           </p>
         </div>
 
@@ -211,7 +211,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
             >
               {resetLoading ? 'Enviando...' : 'Esqueci minha senha'}
             </button>
-            <span className="text-[10px] text-rose-100/55">ConexÃ£o segura</span>
+            <span className="text-[10px] text-rose-100/55">Conexão segura</span>
           </div>
 
           <label className="flex items-start gap-3 mt-2 cursor-pointer">
@@ -238,7 +238,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
                 rel="noreferrer"
                 className="text-rose-200/80 underline decoration-rose-400/30 underline-offset-2"
               >
-                PolÃ­tica de Privacidade
+                Política de Privacidade
               </a>
               . Tenho 18 anos ou mais.
             </span>

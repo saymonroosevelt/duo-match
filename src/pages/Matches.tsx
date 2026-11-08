@@ -48,7 +48,7 @@ export default function Matches({
 
       setToast({
         type: 'success',
-        message: `Ã‰ um match com ${firstName(like.otherUser?.full_name)}! Abra a conversa.`,
+        message: `É um match com ${firstName(like.otherUser?.full_name)}! Abra a conversa.`,
       });
       await reload();
     } catch (likeError) {
@@ -65,7 +65,7 @@ export default function Matches({
           <div>
             <h1 className="text-3xl font-serif text-rose-50 tracking-tight">Matches</h1>
             <p className="text-rose-100/40 text-xs mt-1">
-              Interesses recÃ­procos aprovados pela curadoria.
+              Interesses recíprocos aprovados pela curadoria.
             </p>
           </div>
           <button
@@ -115,7 +115,7 @@ export default function Matches({
                         {like.otherUser?.full_name}
                       </h3>
                       <p className="text-[10px] text-rose-100/40 truncate w-full mt-0.5">
-                        {like.otherUser?.city || 'Cidade nÃ£o informada'}
+                        {like.otherUser?.city || 'Cidade não informada'}
                       </p>
                       <button
                         type="button"
@@ -145,7 +145,7 @@ export default function Matches({
                     </p>
                     <p className="text-sm text-rose-50">
                       {likes.length}{' '}
-                      {likes.length === 1 ? 'pessoa curtiu' : 'pessoas curtiram'} vocÃª
+                      {likes.length === 1 ? 'pessoa curtiu' : 'pessoas curtiram'} você
                     </p>
                   </div>
                 </div>
@@ -180,8 +180,8 @@ export default function Matches({
         ) : matches.length === 0 ? (
           <EmptyState
             icon={Heart}
-            title="Seus matches vÃ£o aparecer aqui"
-            description="Quando vocÃª e outra pessoa demonstrarem interesse recÃ­proco, o match Ã© criado e a conversa Ã© liberada."
+            title="Seus matches vão aparecer aqui"
+            description="Quando você e outra pessoa demonstrarem interesse recíproco, o match é criado e a conversa é liberada."
             actionLabel="Descobrir pessoas"
             onAction={onGoExplore}
           />
@@ -206,14 +206,14 @@ export default function Matches({
                       <ChevronRight size={16} className="text-rose-100/25 shrink-0" />
                     </div>
                     <p className="text-[11px] text-rose-100/40 truncate mt-0.5">
-                      {other.city || 'Cidade nÃ£o informada'}
+                      {other.city || 'Cidade não informada'}
                     </p>
                     <div className="flex items-center gap-1.5 mt-2">
                       <Sparkles size={11} className="text-rose-400/70 shrink-0" />
                       <p className="text-[11px] text-rose-100/50 truncate">
                         {match.lastMessage
                           ? match.lastMessage.content
-                          : 'VocÃªs deram match. Comece a conversa.'}
+                          : 'Vocês deram match. Comece a conversa.'}
                       </p>
                     </div>
                   </div>
@@ -231,7 +231,7 @@ export default function Matches({
 
             {planState.subscription && (
               <p className="text-center text-[10px] text-rose-100/25 pt-2">
-                Plano {planState.plan?.name || 'selecionado'} Â·{' '}
+                Plano {planState.plan?.name || 'selecionado'} ·{' '}
                 {planState.subscription.status === 'active'
                   ? 'ativo'
                   : 'aguardando pagamento'}

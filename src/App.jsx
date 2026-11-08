@@ -123,7 +123,7 @@ function App() {
       active = false;
       subscription.unsubscribe();
     };
-    // O perfil Ã© lido apenas na troca de sessÃ£o; ediÃ§Ãµes usam refreshProfile.
+    // O perfil é lido apenas na troca de sessão; edições usam refreshProfile.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProfile]);
 
@@ -232,7 +232,7 @@ function App() {
     );
   }
 
-  // Telas sobrepostas (planos, privacidade, ediÃ§Ã£o, comunidades, admin)
+  // Telas sobrepostas (planos, privacidade, edição, comunidades, admin)
   if (overlay) {
     if (overlay === 'interests') {
       return (
@@ -442,7 +442,7 @@ function AdminDenied() {
       </div>
       <h1 className="text-3xl font-serif text-rose-50 mb-2">Acesso restrito</h1>
       <p className="text-sm text-rose-100/45 max-w-xs leading-relaxed mb-7">
-        Esta Ã¡rea Ã© exclusiva da equipe de curadoria do Duo Match.
+        Esta área é exclusiva da equipe de curadoria do Duo Match.
       </p>
       <button
         type="button"

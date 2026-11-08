@@ -50,7 +50,7 @@ export default function Messages({
           <div>
             <h1 className="text-3xl font-serif text-rose-50 tracking-tight">Mensagens</h1>
             <p className="text-rose-100/40 text-xs mt-1">
-              Conversas que comeÃ§aram com um match.
+              Conversas que começaram com um match.
             </p>
           </div>
           <button
@@ -100,7 +100,7 @@ export default function Messages({
             description={
               search
                 ? 'Tente buscar por outro nome.'
-                : 'Quando vocÃª e outra pessoa demonstrarem interesse recÃ­proco, a conversa aparece aqui.'
+                : 'Quando você e outra pessoa demonstrarem interesse recíproco, a conversa aparece aqui.'
             }
             actionLabel={!search ? 'Descobrir pessoas' : undefined}
             onAction={!search ? onGoExplore : undefined}
@@ -137,12 +137,12 @@ export default function Messages({
                     <p className="text-xs text-rose-100/45 truncate mt-0.5">
                       {last ? (
                         <>
-                          {isMine && <span className="text-rose-200/60">VocÃª: </span>}
+                          {isMine && <span className="text-rose-200/60">Você: </span>}
                           {last.content}
                         </>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-rose-300/60">
-                          <Sparkles size={12} /> VocÃªs deram match. Diga olÃ¡.
+                          <Sparkles size={12} /> Vocês deram match. Diga olá.
                         </span>
                       )}
                     </p>

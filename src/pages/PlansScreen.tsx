@@ -64,7 +64,7 @@ export default function PlansScreen({ user, onBack }) {
       setToast({
         type: 'error',
         message:
-          'O plano ainda nÃ£o estÃ¡ no banco. Rode o SQL de consolidaÃ§Ã£o do briefing no Supabase.',
+          'O plano ainda não está no banco. Rode o SQL de consolidação do briefing no Supabase.',
       });
       return;
     }
@@ -112,7 +112,7 @@ export default function PlansScreen({ user, onBack }) {
         setToast({
           type: 'error',
           message:
-            'VocÃª jÃ¡ tem um plano ativo. A troca serÃ¡ liberada junto com o pagamento.',
+            'Você já tem um plano ativo. A troca será liberada junto com o pagamento.',
         });
         return;
       }
@@ -149,8 +149,8 @@ export default function PlansScreen({ user, onBack }) {
             Escolha como viver o Duo Match.
           </h2>
           <p className="text-sm text-rose-100/45 leading-relaxed mt-2 max-w-xs mx-auto">
-            A curadoria aprova cada perfil antes do acesso. O pagamento serÃ¡
-            habilitado em breve e nenhuma cobranÃ§a Ã© feita agora.
+            A curadoria aprova cada perfil antes do acesso. O pagamento será
+            habilitado em breve e nenhuma cobrança é feita agora.
           </p>
         </div>
 
@@ -162,7 +162,7 @@ export default function PlansScreen({ user, onBack }) {
                 : 'border-amber-700/30 bg-amber-950/20 text-amber-200/80'
             }`}
           >
-            Plano atual: <strong>{planState.plan?.name || 'selecionado'}</strong> Â·{' '}
+            Plano atual: <strong>{planState.plan?.name || 'selecionado'}</strong> ·{' '}
             {PLAN_STATUS_LABELS[planState.subscription.status] ||
               planState.subscription.status}
           </div>
@@ -170,8 +170,8 @@ export default function PlansScreen({ user, onBack }) {
 
         {usingFallback && (
           <div className="mb-4 rounded-2xl border border-amber-700/25 bg-amber-950/20 px-4 py-3 text-[11px] text-amber-200/70 leading-relaxed">
-            Exibindo a prÃ©via dos planos. Rode o SQL de consolidaÃ§Ã£o do briefing
-            no Supabase para habilitar a seleÃ§Ã£o.
+            Exibindo a prévia dos planos. Rode o SQL de consolidação do briefing
+            no Supabase para habilitar a seleção.
           </div>
         )}
 
@@ -219,7 +219,7 @@ export default function PlansScreen({ user, onBack }) {
                           )}
                         </div>
                         <p className="text-xs text-rose-100/45 leading-relaxed mt-2 max-w-[280px]">
-                          {plan.description || 'Uma experiÃªncia Duo Match.'}
+                          {plan.description || 'Uma experiência Duo Match.'}
                         </p>
                       </div>
                       {isCurrent && (
@@ -234,7 +234,7 @@ export default function PlansScreen({ user, onBack }) {
                         {formatPrice(plan.price)}
                       </span>
                       <span className="text-xs text-rose-100/35 mb-1">
-                        /{plan.interval === 'year' ? 'ano' : 'mÃªs'}
+                        /{plan.interval === 'year' ? 'ano' : 'mês'}
                       </span>
                     </div>
 
@@ -301,17 +301,17 @@ export default function PlansScreen({ user, onBack }) {
           <InfoRow
             icon={ShieldCheck}
             title="Curadoria antes do acesso"
-            text="Cada perfil Ã© aprovado manualmente antes de aparecer no Descobrir."
+            text="Cada perfil é aprovado manualmente antes de aparecer no Descobrir."
           />
           <InfoRow
             icon={Lock}
-            title="Pagamento seguro, sem simulaÃ§Ã£o"
-            text="A arquitetura jÃ¡ estÃ¡ pronta para um gateway real. Nada Ã© cobrado nesta versÃ£o."
+            title="Pagamento seguro, sem simulação"
+            text="A arquitetura já está pronta para um gateway real. Nada é cobrado nesta versão."
           />
           <InfoRow
             icon={Sparkles}
             title="Cancele quando quiser"
-            text="O gerenciamento da assinatura serÃ¡ liberado junto com o pagamento."
+            text="O gerenciamento da assinatura será liberado junto com o pagamento."
           />
         </div>
       </div>
@@ -327,7 +327,7 @@ export default function PlansScreen({ user, onBack }) {
               Plano selecionado
             </h2>
             <p className="text-sm text-rose-100/55 leading-relaxed">
-              VocÃª escolheu o <strong>{confirmation.plan.name}</strong>.
+              Você escolheu o <strong>{confirmation.plan.name}</strong>.
             </p>
             <p className="text-xs text-amber-200/60 leading-relaxed mt-3">
               {confirmation.message}

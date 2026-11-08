@@ -25,11 +25,11 @@ export default function Interests({
             Comunidades Duo Match
           </p>
           <h2 className="text-3xl font-serif text-rose-50 leading-tight">
-            Encontre pessoas que gostam das mesmas coisas que vocÃª.
+            Encontre pessoas que gostam das mesmas coisas que você.
           </h2>
           <p className="text-sm text-rose-100/40 leading-relaxed mt-3">
             Toque em um interesse para ver perfis aprovados que compartilham essa
-            paixÃ£o.
+            paixão.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ export default function Interests({
         </div>
 
         <p className="text-center text-[10px] uppercase tracking-[0.2em] text-rose-100/20 mt-8">
-          Curadoria privada Â· Duo Match
+          Curadoria privada · Duo Match
         </p>
       </div>
     </div>

@@ -18,9 +18,9 @@ import Avatar from '../components/Avatar';
 import Toast from '../components/Toast';
 
 const ICE_BREAKERS = [
-  'Qual foi a Ãºltima coisa que te fez rir de verdade?',
-  'O que vocÃª estÃ¡ lendo ou assistindo agora?',
-  'Qual lugar do mundo vocÃª ainda quer conhecer?',
+  'Qual foi a última coisa que te fez rir de verdade?',
+  'O que você está lendo ou assistindo agora?',
+  'Qual lugar do mundo você ainda quer conhecer?',
 ];
 
 export default function Chat({
@@ -192,7 +192,7 @@ export default function Chat({
     setMenuOpen(false);
     setToast({
       type: 'success',
-      message: 'Perfil bloqueado. Ele nÃ£o aparecerÃ¡ mais no Descobrir.',
+      message: 'Perfil bloqueado. Ele não aparecerá mais no Descobrir.',
     });
   }
 
@@ -240,7 +240,7 @@ export default function Chat({
     setMenuOpen(false);
     setToast({
       type: 'success',
-      message: 'DenÃºncia enviada. Nossa curadoria vai analisar.',
+      message: 'Denúncia enviada. Nossa curadoria vai analisar.',
     });
   }
 
@@ -279,7 +279,7 @@ export default function Chat({
               type="button"
               onClick={() => setMenuOpen((value) => !value)}
               className="w-9 h-9 rounded-full flex items-center justify-center text-rose-100/60 hover:bg-white/5 transition-colors"
-              aria-label="OpÃ§Ãµes da conversa"
+              aria-label="Opções da conversa"
             >
               <MoreVertical size={19} />
             </button>
@@ -368,7 +368,7 @@ export default function Chat({
                 <MessageCircle size={22} className="text-rose-300/80" />
               </div>
               <h3 className="font-serif text-2xl text-rose-50 mb-1">
-                VocÃªs deram match
+                Vocês deram match
               </h3>
               <p className="text-sm text-rose-100/45 max-w-[260px] mx-auto leading-relaxed">
                 Que tal quebrar o gelo? Escolha uma ideia ou escreva do seu jeito.
@@ -450,8 +450,8 @@ export default function Chat({
             <Lock size={20} className="text-rose-300/70 mx-auto mb-2" />
             <p className="text-sm text-rose-100/60">
               {blockedByMe
-                ? 'VocÃª bloqueou este perfil. Desbloqueie para voltar a conversar.'
-                : 'Esta conversa nÃ£o estÃ¡ mais disponÃ­vel.'}
+                ? 'Você bloqueou este perfil. Desbloqueie para voltar a conversar.'
+                : 'Esta conversa não está mais disponível.'}
             </p>
             {blockedByMe && (
               <button
@@ -496,7 +496,7 @@ export default function Chat({
             type="button"
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setReportOpen(false)}
-            aria-label="Fechar denÃºncia"
+            aria-label="Fechar denúncia"
           />
           <form
             onSubmit={handleReport}
@@ -517,7 +517,7 @@ export default function Chat({
               </button>
             </div>
             <p className="text-xs text-rose-100/45 leading-relaxed mb-4">
-              Sua denÃºncia Ã© confidencial. Nossa curadoria analisa todos os casos.
+              Sua denúncia é confidencial. Nossa curadoria analisa todos os casos.
             </p>
 
             <div className="space-y-2 mb-4">
@@ -551,7 +551,7 @@ export default function Chat({
               disabled={reporting}
               className="w-full rounded-full bg-[#f4ece8] py-3.5 text-sm font-semibold text-[#3a1c1c] disabled:opacity-50 hover:bg-white transition-colors"
             >
-              {reporting ? 'Enviando...' : 'Enviar denÃºncia'}
+              {reporting ? 'Enviando...' : 'Enviar denúncia'}
             </button>
           </form>
         </div>
@@ -571,8 +571,8 @@ export default function Chat({
             </div>
             <h2 className="text-xl font-serif text-rose-50 mb-2">Bloquear perfil?</h2>
             <p className="text-xs text-rose-100/50 leading-relaxed mb-6">
-              O perfil deixa de aparecer no Descobrir e a conversa fica indisponÃ­vel.
-              VocÃª pode desbloquear depois.
+              O perfil deixa de aparecer no Descobrir e a conversa fica indisponível.
+              Você pode desbloquear depois.
             </p>
             <div className="flex gap-3">
               <button

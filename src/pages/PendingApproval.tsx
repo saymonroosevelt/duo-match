@@ -18,30 +18,30 @@ export default function PendingApproval() {
         </div>
 
         <h1 className="text-4xl font-serif mb-3 text-rose-50 text-center leading-tight">
-          Perfil em anÃ¡lise
+          Perfil em análise
         </h1>
         <p className="text-rose-100/55 mb-8 leading-relaxed text-center text-sm">
-          Nossa curadoria estÃ¡ verificando seus dados com cuidado. O acesso ao
-          Descobrir, matches e conversas Ã© liberado somente apÃ³s a aprovaÃ§Ã£o.
+          Nossa curadoria está verificando seus dados com cuidado. O acesso ao
+          Descobrir, matches e conversas é liberado somente após a aprovação.
         </p>
 
         <div className="rounded-3xl border border-white/[0.07] bg-white/[0.035] p-5 mb-8">
           <TimelineItem
             icon={Check}
             title="Cadastro recebido"
-            description="Seus dados foram enviados com seguranÃ§a."
+            description="Seus dados foram enviados com segurança."
             state="done"
           />
           <TimelineItem
             icon={Clock}
             title="Curadoria em andamento"
-            description="Nossa equipe avalia perfil, intenÃ§Ãµes e interesses."
+            description="Nossa equipe avalia perfil, intenções e interesses."
             state="active"
           />
           <TimelineItem
             icon={Lock}
             title="Acesso liberado"
-            description="VocÃª poderÃ¡ explorar, dar match e conversar."
+            description="Você poderá explorar, dar match e conversar."
             state="locked"
             last
           />
@@ -65,7 +65,7 @@ export default function PendingApproval() {
         </div>
 
         <p className="text-center text-[10px] text-rose-100/25 mt-6 leading-relaxed">
-          A anÃ¡lise Ã© manual e pode levar alguns minutos. NÃ£o Ã© necessÃ¡rio pagar
+          A análise é manual e pode levar alguns minutos. Não é necessário pagar
           para participar da curadoria.
         </p>
       </div>

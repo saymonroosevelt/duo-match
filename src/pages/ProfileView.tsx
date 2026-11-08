@@ -57,7 +57,7 @@ export default function ProfileView({
         <div className="flex items-center justify-between mb-5">
           <div>
             <h1 className="text-3xl font-serif text-rose-50 tracking-tight">Perfil</h1>
-            <p className="text-rose-100/40 text-xs mt-1">Sua presenÃ§a no Duo Match.</p>
+            <p className="text-rose-100/40 text-xs mt-1">Sua presença no Duo Match.</p>
           </div>
           <button
             type="button"
@@ -90,7 +90,7 @@ export default function ProfileView({
 
             <p className="text-xs text-rose-100/45 flex items-center justify-center gap-1.5 mt-1.5">
               <MapPin size={13} />
-              {profile.city || 'Cidade nÃ£o informada'}
+              {profile.city || 'Cidade não informada'}
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
@@ -116,11 +116,11 @@ export default function ProfileView({
           <div className="flex items-center gap-2 mb-2">
             <Sparkles size={14} className="text-rose-400/80" />
             <h3 className="text-[10px] uppercase tracking-[0.2em] text-rose-100/45">
-              Sobre vocÃª
+              Sobre você
             </h3>
           </div>
           <p className="text-sm text-rose-100/70 leading-relaxed whitespace-pre-line">
-            {profile.bio || 'Adicione uma descriÃ§Ã£o para que as pessoas conheÃ§am vocÃª.'}
+            {profile.bio || 'Adicione uma descrição para que as pessoas conheçam você.'}
           </p>
         </section>
 
@@ -129,7 +129,7 @@ export default function ProfileView({
             <div className="flex items-center gap-2 mb-1.5">
               <Heart size={14} className="text-rose-400" />
               <h3 className="text-[10px] uppercase tracking-[0.2em] text-rose-300/60">
-                O que vocÃª busca
+                O que você busca
               </h3>
             </div>
             <p className="text-sm text-rose-50/90">{profile.what_procura}</p>
@@ -157,7 +157,7 @@ export default function ProfileView({
         {values.length > 0 && (
           <section className="mt-3 rounded-3xl border border-white/[0.07] bg-white/[0.035] p-5">
             <h3 className="text-[10px] uppercase tracking-[0.2em] text-rose-100/45 mb-3">
-              Valores inegociÃ¡veis
+              Valores inegociáveis
             </h3>
             <div className="flex flex-wrap gap-2">
               {values.map((value) => (
@@ -213,7 +213,7 @@ export default function ProfileView({
           <MenuRow
             icon={Pencil}
             label="Editar perfil"
-            description="Foto, bio, intenÃ§Ãµes e interesses"
+            description="Foto, bio, intenções e interesses"
             onClick={onEdit}
           />
           <MenuRow
@@ -225,7 +225,7 @@ export default function ProfileView({
           <MenuRow
             icon={Shield}
             label="Privacidade e dados"
-            description="LGPD, termos e exclusÃ£o da conta"
+            description="LGPD, termos e exclusão da conta"
             onClick={onOpenPrivacy}
           />
           {isAdmin && onOpenAdmin && (
@@ -247,14 +247,14 @@ export default function ProfileView({
             <div className="flex-1">
               <p className="text-sm text-red-200/80">Sair da conta</p>
               <p className="text-[10px] text-rose-100/30 mt-0.5">
-                VocÃª pode entrar novamente quando quiser
+                Você pode entrar novamente quando quiser
               </p>
             </div>
           </button>
         </section>
 
         <p className="text-center text-[10px] text-rose-100/20 mt-6">
-          Duo Match Â· Curadoria privada Â· v1.0
+          Duo Match · Curadoria privada · v1.0
         </p>
       </div>
     </div>

@@ -16,21 +16,21 @@ export default function RejectedApproval() {
         </div>
 
         <h1 className="text-3xl font-serif mb-3 text-rose-50 leading-tight">
-          Curadoria concluÃ­da
+          Curadoria concluída
         </h1>
         <p className="text-rose-100/55 mb-8 leading-relaxed text-sm">
-          Neste momento, seu perfil nÃ£o foi aprovado para a Ã¡rea de membros. Isso
-          pode acontecer por informaÃ§Ãµes incompletas ou por critÃ©rios da curadoria.
+          Neste momento, seu perfil não foi aprovado para a área de membros. Isso
+          pode acontecer por informações incompletas ou por critérios da curadoria.
         </p>
 
         <div className="rounded-3xl border border-white/[0.07] bg-white/[0.035] p-5 mb-8 text-left">
           <p className="text-[10px] uppercase tracking-widest text-rose-300/50 mb-2">
-            O que vocÃª pode fazer
+            O que você pode fazer
           </p>
           <ul className="space-y-2 text-xs text-rose-100/50 leading-relaxed">
-            <li>Â· Revise suas informaÃ§Ãµes e tente novamente com dados completos.</li>
-            <li>Â· Fale com a curadoria para entender o que pode ser ajustado.</li>
-            <li>Â· VocÃª pode sair da conta e criar um novo cadastro com outro e-mail.</li>
+            <li>· Revise suas informações e tente novamente com dados completos.</li>
+            <li>· Fale com a curadoria para entender o que pode ser ajustado.</li>
+            <li>· Você pode sair da conta e criar um novo cadastro com outro e-mail.</li>
           </ul>
         </div>
 
