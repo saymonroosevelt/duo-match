@@ -4,7 +4,6 @@ import {
   ChevronRight,
   Lock,
   RefreshCw,
-  Sparkles,
   MessageCircle,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -215,14 +214,10 @@ export default function Matches({
                     <p className="text-[11px] text-rose-100/40 truncate mt-0.5">
                       {other.city || 'Cidade não informada'}
                     </p>
-                    <div className="flex flex-col items-start gap-1 mt-1.5">
-                      <p className="text-[11px] text-rose-100/55 truncate w-full inline-flex items-center gap-1.5">
-                        <Sparkles size={11} className="text-rose-400/80 shrink-0" />
-                        {match.lastMessage
-                          ? match.lastMessage.content
-                          : 'Vocês deram match. Comece a conversa.'}
-                      </p>
-                    </div>
+                    <p className="text-[11px] text-rose-100/45 mt-1.5 inline-flex items-center gap-1.5">
+                      <MessageCircle size={11} className="text-rose-400/70 shrink-0" />
+                      Toque para abrir a conversa
+                    </p>
                   </div>
                 </button>
               );
