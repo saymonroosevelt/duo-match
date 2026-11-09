@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from './supabase';
+import { readOpenedMap } from './unread';
 
 // Carrega os matches do usuário, os perfis das outras pessoas e a última
 // mensagem de cada conversa. Também separa as curtidas recebidas.
@@ -73,6 +74,8 @@ export default function useMatches() {
     const matchIds = matchedRows.map((row) => row.id);
 
     const lastByMatch = {};
+    const unreadByMatch = {};
+    const lastOpened = readOpenedMap();
     if (matchIds.length > 0) {
       const { data: messageRows } = await supabase
         .from('messages')
@@ -83,6 +86,13 @@ export default function useMatches() {
       for (const message of messageRows || []) {
         if (!lastByMatch[message.match_id]) {
           lastByMatch[message.match_id] = message;
+        }
+        if (message.sender_id !== user.id) {
+          const openedAt = lastOpened[String(message.match_id)];
+          if (!openedAt || new Date(message.created_at) > new Date(openedAt)) {
+            unreadByMatch[message.match_id] =
+              (unreadByMatch[message.match_id] || 0) + 1;
+          }
         }
       }
     }
@@ -97,6 +107,7 @@ export default function useMatches() {
           id: row.id,
           otherUser,
           lastMessage: lastByMatch[row.id] || null,
+          unread: unreadByMatch[row.id] || 0,
           createdAt: row.created_at,
         };
       })

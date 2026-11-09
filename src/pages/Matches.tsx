@@ -194,12 +194,19 @@ export default function Matches({
                   key={match.id}
                   type="button"
                   onClick={() => onSelectMatch(match.id, other)}
-                  className="w-full flex items-center gap-3.5 rounded-3xl border border-white/[0.07] bg-white/[0.035] p-4 text-left hover:bg-white/[0.06] active:scale-[0.99] transition-all"
+                  className="w-full flex items-center gap-3.5 rounded-3xl border border-white/[0.07] bg-white/[0.035] hover:bg-white/[0.055] active:scale-[0.99] p-3.5 text-left transition-all"
                 >
-                  <Avatar src={other.photo_url} name={other.full_name} size="md" />
+                  <div className="relative shrink-0">
+                    <Avatar src={other.photo_url} name={other.full_name} size="md" />
+                    {(match.unread || 0) > 0 && (
+                      <span className="absolute -bottom-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-[9px] font-bold text-white flex items-center justify-center border-2 border-[#120306]">
+                        {match.unread > 9 ? '9+' : match.unread}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="font-serif text-lg text-rose-50 truncate">
+                      <h3 className="font-serif text-[17px] text-rose-50 truncate">
                         {other.full_name || 'Perfil'}
                         {other.age ? `, ${other.age}` : ''}
                       </h3>
@@ -208,9 +215,9 @@ export default function Matches({
                     <p className="text-[11px] text-rose-100/40 truncate mt-0.5">
                       {other.city || 'Cidade não informada'}
                     </p>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <Sparkles size={11} className="text-rose-400/70 shrink-0" />
-                      <p className="text-[11px] text-rose-100/50 truncate">
+                    <div className="flex flex-col items-start gap-1 mt-1.5">
+                      <p className="text-[11px] text-rose-100/55 truncate w-full inline-flex items-center gap-1.5">
+                        <Sparkles size={11} className="text-rose-400/80 shrink-0" />
                         {match.lastMessage
                           ? match.lastMessage.content
                           : 'Vocês deram match. Comece a conversa.'}

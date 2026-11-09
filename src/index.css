@@ -106,6 +106,15 @@ select:-webkit-autofill {
   object-position: center;
 }
 
+/* Scrollbar horizontal visível mas sutil para o carrossel de matches */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Espaço seguro acima do rodapé fixo + safe-area do Android/iOS */
 .pb-nav {
   padding-bottom: calc(9rem + env(safe-area-inset-bottom, 0px));

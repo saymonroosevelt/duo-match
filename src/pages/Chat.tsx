@@ -14,6 +14,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { REPORT_REASONS } from '../lib/constants';
 import { asArray, dayLabel, formatTime, friendlyError } from '../lib/helpers';
+import { markMatchOpened } from '../lib/unread';
 import Avatar from '../components/Avatar';
 import Toast from '../components/Toast';
 
@@ -54,6 +55,7 @@ export default function Chat({
 
   useEffect(() => {
     let active = true;
+    markMatchOpened(matchId);
 
     async function init() {
       const {
