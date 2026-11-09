@@ -99,15 +99,19 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
     if (!isLogin) {
       if (result.data.session) {
         setMessage('Conta criada! Vamos completar seu perfil.');
+        setMessageType('success');
+        // iOS/PWA: boot limpo evita estado preso no navegador (telas de carga infinita)
+        setTimeout(() => window.location.reload(), 800);
       } else {
         setMessage(
           'Conta criada! Enviamos um link de confirmação para o seu e-mail. Depois de confirmar, volte e entre.',
         );
+        setMessageType('success');
       }
-      setMessageType('success');
     } else {
       setMessage('Login realizado. Bem-vindo de volta.');
       setMessageType('success');
+      setTimeout(() => window.location.reload(), 600);
     }
   }
 
