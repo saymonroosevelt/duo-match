@@ -9,7 +9,7 @@
 export const PAYMENT_PROVIDER =
   import.meta.env.VITE_PAYMENT_PROVIDER || 'not_configured';
 
-// Link de pagamento/vendas do Duo Match (configurável na Netlify via VITE_PAYMENT_URL)
+// Link de pagamento/vendas do Duo Match (configurável no deploy via VITE_PAYMENT_URL)
 export const PAYMENT_URL =
   import.meta.env.VITE_PAYMENT_URL || 'https://pay.kiwify.com.br/ck6EHDX';
 

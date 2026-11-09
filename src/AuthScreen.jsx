@@ -40,12 +40,12 @@ function clearLocalAttempts() {
   }
 }
 
-// Tenta a função serverless do Netlify (rate limit por IP real).
+// Tenta a função serverless da Vercel (rate limit por IP real).
 // Retorna null se a função estiver indisponível — aí usamos o Supabase direto.
 async function tryRateLimitedLogin(email, password) {
   let r;
   try {
-    r = await fetch('/.netlify/functions/login', {
+    r = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -131,7 +131,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
 
     setLoading(true);
 
-    // Caminho preferencial quando for login: função Netlify com rate limit por IP
+    // Caminho preferencial quando for login: função serverless com rate limit por IP
     if (isLogin) {
       // Anteparo local: impede spam óbvio no próprio dispositivo
       const local = readLocalAttempts();

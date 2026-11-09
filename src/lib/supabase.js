@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Fallbacks publishable (seguras para o bundle público; RLS protege os dados).
-// Variáveis de ambiente da Netlify, se definidas, têm precedência.
+// Variáveis de ambiente do deploy, se definidas, têm precedência.
 const supabaseUrl =
   import.meta.env.VITE_SUPABASE_URL ||
   'https://hnvcxgbgjxbtlvnrehqn.supabase.co';
@@ -13,7 +13,7 @@ export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
 const notConfiguredError = () =>
   new Error(
-    'Supabase não configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no deploy da Netlify.',
+    'Supabase não configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no deploy.',
   );
 
 function createNotConfiguredClient() {
