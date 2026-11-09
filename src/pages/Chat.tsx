@@ -10,12 +10,14 @@ import {
   X,
   MessageCircle,
   Heart,
+  User,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { REPORT_REASONS } from '../lib/constants';
 import { asArray, dayLabel, formatTime, friendlyError } from '../lib/helpers';
 import { markMatchOpened } from '../lib/unread';
 import Avatar from '../components/Avatar';
+import MatchProfileModal from '../components/MatchProfileModal';
 import Toast from '../components/Toast';
 
 const ICE_BREAKERS = [
@@ -40,6 +42,7 @@ export default function Chat({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [blockOpen, setBlockOpen] = useState(false);
   const [blocked, setBlocked] = useState(false);
@@ -264,8 +267,9 @@ export default function Chat({
 
           <button
             type="button"
-            onClick={() => setMenuOpen((value) => !value)}
+            onClick={() => setProfileOpen(true)}
             className="flex flex-1 items-center gap-3 min-w-0 text-left"
+            aria-label={`Ver perfil de ${name}`}
           >
             <Avatar src={otherUser?.photo_url} name={name} size="sm" />
             <div className="min-w-0 flex-1">
@@ -295,6 +299,16 @@ export default function Chat({
                   aria-label="Fechar menu"
                 />
                 <div className="absolute right-0 top-11 z-50 w-52 rounded-2xl border border-white/10 bg-[#1C1C1E] p-1.5 shadow-2xl animate-scale-in">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileOpen(true);
+                      setMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-rose-100/75 hover:bg-white/5 transition-colors"
+                  >
+                    <User size={15} className="text-rose-300/80" /> Ver perfil
+                  </button>
                   <button
                     type="button"
                     onClick={() => {
@@ -594,6 +608,13 @@ export default function Chat({
             </div>
           </div>
         </div>
+      )}
+
+      {profileOpen && (
+        <MatchProfileModal
+          profile={otherUser}
+          onClose={() => setProfileOpen(false)}
+        />
       )}
 
       {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
