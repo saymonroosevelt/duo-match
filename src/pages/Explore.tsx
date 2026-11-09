@@ -10,11 +10,12 @@ import {
   RefreshCw,
   RotateCcw,
   Sparkles,
+  ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { INTEREST_OPTIONS } from '../lib/constants';
-import { asArray, firstName, friendlyError } from '../lib/helpers';
+import { asArray, firstName, friendlyError, profilePhotos } from '../lib/helpers';
 import { haversineKm, isValidCoord } from '../lib/geo';
 import Avatar from '../components/Avatar';
 import EmptyState from '../components/EmptyState';
@@ -54,6 +55,7 @@ export default function Explore({
   const [myCoords, setMyCoords] = useState<any>(null);
   const [dragX, setDragX] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  const [photoIndex, setPhotoIndex] = useState(0);
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     if (processing) return;
@@ -191,6 +193,17 @@ export default function Explore({
   }, [loadProfiles, refreshKey]);
 
   const current = profiles[index] || null;
+  const currentPhotos = current ? profilePhotos(current) : [];
+  const clampedPhotoIndex = Math.min(
+    photoIndex,
+    Math.max(0, currentPhotos.length - 1),
+  );
+  const currentId = current?.id;
+
+  // Reseta a navegação da galeria sempre que o card muda
+  useEffect(() => {
+    setPhotoIndex(0);
+  }, [currentId]);
 
   const locationLabel = (profile: any) => {
     const km = haversineKm(myCoords, profile);
@@ -238,6 +251,7 @@ export default function Explore({
 
   function advance() {
     setDetailOpen(false);
+    setPhotoIndex(0);
     setIndex((value) => value + 1);
   }
 
@@ -469,26 +483,16 @@ export default function Explore({
               Passar
             </div>
 
-            {current.photo_url ? (
-              <img
-                src={current.photo_url}
-                alt={current.full_name || 'Perfil'}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-[#1a0205] flex flex-col items-center justify-center">
-                <div className="w-28 h-28 rounded-full border border-rose-200/20 bg-black/20 flex items-center justify-center font-serif text-5xl text-rose-100/70">
-                  {(current.full_name || '♡').trim().charAt(0).toUpperCase()}
-                </div>
-                <p className="text-rose-100/30 text-xs uppercase tracking-[0.25em] mt-5">
-                  Foto em breve
-                </p>
-              </div>
-            )}
+            <PhotoPager
+              photos={currentPhotos}
+              index={clampedPhotoIndex}
+              onIndexChange={setPhotoIndex}
+              alt={current.full_name || 'Perfil'}
+            />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent pointer-events-none" />
 
-            <div className="absolute top-4 left-4 right-4 flex items-start justify-between gap-2">
+            <div className="absolute top-4 left-4 right-4 z-20 flex items-start justify-between gap-2">
               <div className="flex flex-col gap-2">
                 {current.likedYou && (
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600/90 backdrop-blur px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg">
@@ -726,25 +730,18 @@ export default function Explore({
             aria-label="Fechar perfil"
           />
           <div className="relative w-full max-w-md max-h-[92vh] overflow-y-auto rounded-t-[32px] border-t border-white/10 bg-[#171719] animate-slide-up">
-            <div className="relative h-72">
-              {current.photo_url ? (
-                <img
-                  src={current.photo_url}
-                  alt={current.full_name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-[#1a0205] flex items-center justify-center">
-                  <span className="font-serif text-6xl text-rose-100/60">
-                    {(current.full_name || '♡').trim().charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#171719] via-transparent to-black/30" />
+            <div className="relative h-72 overflow-hidden">
+              <PhotoPager
+                photos={currentPhotos}
+                index={clampedPhotoIndex}
+                onIndexChange={setPhotoIndex}
+                alt={current.full_name}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#171719] via-transparent to-black/30 pointer-events-none" />
               <button
                 type="button"
                 onClick={() => setDetailOpen(false)}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur border border-white/10 flex items-center justify-center text-white"
+                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/50 backdrop-blur border border-white/10 flex items-center justify-center text-white"
                 aria-label="Fechar"
               >
                 <X size={18} />
@@ -891,5 +888,110 @@ export default function Explore({
 
       <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
+  );
+}
+
+// Galeria no card (estilo Tinder): barras de progresso no topo,
+// zonas de toque nas laterais e contador de fotos.
+function PhotoPager({
+  photos,
+  index,
+  onIndexChange,
+  alt,
+}: {
+  photos: string[];
+  index: number;
+  onIndexChange: (index: number) => void;
+  alt: string;
+}) {
+  if (!photos.length) {
+    return (
+      <div className="absolute inset-0 bg-[#1a0205] flex flex-col items-center justify-center">
+        <div className="w-28 h-28 rounded-full border border-rose-200/20 bg-black/20 flex items-center justify-center font-serif text-5xl text-rose-100/70">
+          ♡
+        </div>
+        <p className="text-rose-100/30 text-xs uppercase tracking-[0.25em] mt-5">
+          Foto em breve
+        </p>
+      </div>
+    );
+  }
+
+  const clamped = Math.min(index, photos.length - 1);
+  const photo = photos[clamped];
+
+  return (
+    <>
+      <img
+        key={photo}
+        src={photo}
+        alt={alt}
+        draggable={false}
+        className="absolute inset-0 h-full w-full object-cover select-none"
+      />
+
+      {/* Barras de progresso: quantos slots o perfil tem e em qual você está */}
+      {photos.length > 1 && (
+        <div
+          className="absolute top-3 left-3 right-3 z-20 flex gap-1.5"
+          aria-hidden="true"
+        >
+          {photos.map((url, i) => (
+            <div
+              key={`${url}-${i}`}
+              className="h-[3px] flex-1 overflow-hidden rounded-full bg-black/50"
+            >
+              <div
+                className={`h-full rounded-full bg-white transition-all duration-200 ${
+                  i <= clamped ? 'w-full' : 'w-0'
+                }`}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Zona de toque esquerda — foto anterior */}
+      {clamped > 0 && (
+        <button
+          type="button"
+          onClick={() => onIndexChange(clamped - 1)}
+          aria-label="Foto anterior"
+          className="absolute inset-y-0 left-0 z-10 flex w-1/4 items-center justify-start pl-2"
+        >
+          <ChevronLeft
+            size={30}
+            strokeWidth={2.4}
+            className="text-white opacity-80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]"
+          />
+        </button>
+      )}
+
+      {/* Zona de toque direita — próxima foto */}
+      {clamped < photos.length - 1 && (
+        <button
+          type="button"
+          onClick={() => onIndexChange(clamped + 1)}
+          aria-label="Próxima foto"
+          className="absolute inset-y-0 right-0 z-10 flex w-1/4 items-center justify-end pr-2"
+        >
+          <ChevronRight
+            size={30}
+            strokeWidth={2.4}
+            className="text-white opacity-80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]"
+          />
+        </button>
+      )}
+
+      {/* Contador 1/5 */}
+      {photos.length > 1 && (
+        <span
+          className="absolute top-10 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/15 bg-black/55 px-2.5 py-1 text-[10px] font-semibold tracking-[0.25em] text-white/90 backdrop-blur-sm"
+          aria-hidden="true"
+        >
+          {clamped + 1}/{photos.length}
+        </span>
+      )}
+    </>
   );
 }
