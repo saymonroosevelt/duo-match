@@ -9,6 +9,10 @@
 export const PAYMENT_PROVIDER =
   import.meta.env.VITE_PAYMENT_PROVIDER || 'not_configured';
 
+// Link de pagamento/vendas do Duo Match (configurável na Netlify via VITE_PAYMENT_URL)
+export const PAYMENT_URL =
+  import.meta.env.VITE_PAYMENT_URL || 'https://duomatchapp.netlify.app';
+
 export async function createCheckoutSession({ plan, user }) {
   if (!plan?.id) {
     return {

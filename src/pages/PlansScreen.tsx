@@ -15,7 +15,7 @@ import {
   isSubscriptionActive,
   normalizeFeatures,
 } from '../lib/helpers';
-import { createCheckoutSession } from '../lib/payments';
+import { createCheckoutSession, PAYMENT_URL } from '../lib/payments';
 import usePlan from '../lib/usePlan';
 import BackButton from '../components/BackButton';
 import Toast from '../components/Toast';
@@ -122,6 +122,10 @@ export default function PlansScreen({ user, onBack }) {
         message: checkout.message,
       });
 
+      // Abre a página de pagamento/vendas em uma aba nova — o funil completo:
+      // escolhe o plano → paga lá → a assinatura é ativada pela curadoria.
+      window.open(PAYMENT_URL, '_blank', 'noopener,noreferrer');
+
       await planState.reload();
     } catch (error) {
       setToast({ type: 'error', message: error.message || String(error) });
@@ -149,8 +153,8 @@ export default function PlansScreen({ user, onBack }) {
             Escolha como viver o Duo Match.
           </h2>
           <p className="text-sm text-rose-100/45 leading-relaxed mt-2 max-w-xs mx-auto">
-            A curadoria aprova cada perfil antes do acesso. O pagamento será
-            habilitado em breve e nenhuma cobrança é feita agora.
+            A curadoria aprova cada perfil antes do acesso. Ao escolher o plano,
+            você será levado à página de pagamento.
           </p>
         </div>
 
@@ -305,8 +309,8 @@ export default function PlansScreen({ user, onBack }) {
           />
           <InfoRow
             icon={Lock}
-            title="Pagamento seguro, sem simulação"
-            text="A arquitetura já está pronta para um gateway real. Nada é cobrado nesta versão."
+            title="Pagamento seguro"
+            text="Você é direcionado à página de pagamento para concluir a assinatura de forma segura."
           />
           <InfoRow
             icon={Sparkles}
@@ -330,15 +334,26 @@ export default function PlansScreen({ user, onBack }) {
               Você escolheu o <strong>{confirmation.plan.name}</strong>.
             </p>
             <p className="text-xs text-amber-200/60 leading-relaxed mt-3">
-              {confirmation.message}
+              Abrimos a página de pagamento em uma nova aba. Conclua lá;
+              a curadoria ativa sua assinatura assim que o pagamento for confirmado.
             </p>
-            <button
-              type="button"
-              onClick={() => setConfirmation(null)}
-              className="mt-6 w-full rounded-full bg-[#f4ece8] py-3.5 text-sm font-semibold text-[#3a1c1c] hover:bg-white transition-colors"
-            >
-              Entendi
-            </button>
+            <div className="mt-6 flex flex-col gap-2.5">
+              <a
+                href={PAYMENT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full rounded-full bg-[#f4ece8] py-3.5 text-sm font-semibold text-[#3a1c1c] hover:bg-white transition-colors inline-flex items-center justify-center gap-2"
+              >
+                <CreditCard size={15} /> Ir para o pagamento
+              </a>
+              <button
+                type="button"
+                onClick={() => setConfirmation(null)}
+                className="text-xs text-rose-200/55 hover:text-rose-100 underline underline-offset-4"
+              >
+                Voltar aos planos
+              </button>
+            </div>
           </div>
         </div>
       )}
