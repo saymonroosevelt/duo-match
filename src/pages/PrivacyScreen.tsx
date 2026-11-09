@@ -375,6 +375,13 @@ function PrivacyText() {
           necessárias para segurança e curadoria.
         </p>
         <p>
+          Também coletamos dados técnicos de funcionamento do app (preferência
+          de uso e erros ocorridos) por meio de uma ferramenta de monitoramento
+          (Sentry), contendo apenas o id técnico da conta e detalhes do erro —
+          sem nome, e-mail ou conteúdo das suas mensagens. Servem para corrigir
+          defeitos mais rápido e não são usados para publicidade.
+        </p>
+        <p>
           Não coletamos dados sensíveis além daqueles que você escolher informar
           voluntariamente na sua bio ou nas conversas.
         </p>

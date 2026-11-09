@@ -6,6 +6,7 @@ import {
   User,
   Users,
 } from 'lucide-react';
+import * as Sentry from '@sentry/react';
 import { supabase } from './lib/supabase';
 import { captureAndSaveLocation } from './lib/geo';
 import WelcomeScreen from './WelcomeScreen';
@@ -84,6 +85,11 @@ function App() {
       if (!active) return;
 
       if (!nextSession) {
+        try {
+          Sentry.setUser(null);
+        } catch {
+          // Sentry não configurado — ignora.
+        }
         lastSessionId = null;
         setSession(null);
         setProfile(null);
@@ -97,6 +103,12 @@ function App() {
       }
 
       setSession(nextSession);
+      // Contexto para o Sentry: só o id opaco — nunca e-mail/dados pessoais.
+      try {
+        Sentry.setUser({ id: nextSession.user.id });
+      } catch {
+        // Sentry não configurado — ignora.
+      }
 
       if (lastSessionId === nextSession.user.id && profile) {
         setLoading(false);

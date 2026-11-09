@@ -1,6 +1,8 @@
 import { Component } from 'react';
+import * as Sentry from '@sentry/react';
 
 // Captura qualquer erro de renderização do React e evita tela preta/branca vazia.
+// Erros também são reportados ao Sentry quando o DSN está configurado.
 // Detalhes do erro ficam salvos para copiar e enviar à curadoria.
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -22,6 +24,17 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error('ErrorBoundary capturou:', error, info?.componentStack);
+    try {
+      Sentry.captureException(error, {
+        extra: {
+          componentStack: String(info?.componentStack || ''),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+        },
+      });
+    } catch {
+      // Sentry não configurado — o erro continua no console e na tela de erro.
+    }
     this.setState({
       componentStack: String(info?.componentStack || ''),
     });

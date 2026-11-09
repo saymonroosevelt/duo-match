@@ -1,5 +1,30 @@
 export const config = { runtime: 'edge' };
 
+// Sentry no edge — só ativa quando SENTRY_DSN está configurado.
+// Sem ele, o SDK simplesmente não inicializa e o fluxo segue igual.
+let Sentry = null;
+let sentryInit = null;
+async function getSentry() {
+  if (Sentry) return Sentry;
+  if (!sentryInit) {
+    sentryInit = (async () => {
+      if (!process.env.SENTRY_DSN) return null;
+      try {
+        const mod = await import('@sentry/vercel-edge');
+        mod.init({
+          dsn: process.env.SENTRY_DSN,
+          environment: 'production',
+        });
+        return mod;
+      } catch {
+        return null;
+      }
+    })();
+  }
+  Sentry = await sentryInit;
+  return Sentry;
+}
+
 /**
  * Webhook da Kiwify → Duo Match (Vercel Edge Function)
  *
@@ -209,6 +234,12 @@ export default async function handler(request) {
     if (rows.every((row) => row.status === expectedStatus)) return rows;
 
     logAction('service_role_blocked', { expectedStatus });
+    try {
+      const sentry = await getSentry();
+      sentry?.captureMessage('service_role_blocked: ativação via fallback admin', 'warning');
+    } catch {
+      // Sentry indisponível — segue.
+    }
 
     try {
       const adminToken = await getAdminToken(supabaseUrl, serviceRoleKey, anonKey);
@@ -282,6 +313,14 @@ export default async function handler(request) {
     }
   } catch (error) {
     console.error('Erro ao atualizar assinatura:', error.message);
+    try {
+      const sentry = await getSentry();
+      sentry?.captureException(error, {
+        extra: { eventType, customerEmail, gatewayId },
+      });
+    } catch {
+      // Sentry indisponível — segue.
+    }
     return json({ error: 'database_error', message: error.message }, 500);
   }
 
