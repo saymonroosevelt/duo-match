@@ -72,6 +72,7 @@ function App() {
   const params = new URLSearchParams(window.location.search);
   const isAdminRoute = params.get('admin') === 'true';
   const isLegalRoute = params.get('legal') === '1' || params.get('legal') === 'true';
+  const wantsPlan = params.get('plan') === '1';
 
   const fetchProfile = useCallback((userId) => fetchProfileOnce(userId), []);
 
@@ -163,6 +164,19 @@ function App() {
       active = false;
     };
   }, [session]);
+
+  // Link da landing page com ?plan=1: depois da aprovação, abre a tela de planos.
+  useEffect(() => {
+    if (!wantsPlan || profile?.status !== 'approved') return;
+    setOverlay('plans');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('plan');
+    window.history.replaceState(
+      {},
+      '',
+      `${url.pathname}${url.search}${url.hash}`,
+    );
+  }, [wantsPlan, profile?.status]);
 
   const isAdmin = isAdminUser(session);
   const isPaid = isPaidSubscription(subscription);
