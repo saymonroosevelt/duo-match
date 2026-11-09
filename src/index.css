@@ -108,11 +108,12 @@ select:-webkit-autofill {
 
 /* Espaço seguro acima do rodapé fixo + safe-area do Android/iOS */
 .pb-nav {
-  padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(9rem + env(safe-area-inset-bottom, 0px));
 }
 
-/* Utilitário para safe-area do Android/iOS (barra de gestos + home indicator).
-   No Safari comum env() vale 0 → deixa 1rem de respiro fixo acima da toolbar. */
+/* No Safari do iPhone a barra do navegador NÃO é reportada ao CSS,
+   então garantimos um respiro generoso fixo (min 2.5rem) mesmo com env() = 0.
+   Em modo independente/PWA, env(safe-area-inset-bottom) assume o valor real do aparelho. */
 .pb-safe {
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 2.5rem);
 }

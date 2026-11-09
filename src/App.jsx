@@ -514,7 +514,7 @@ function App() {
       <main className="pb-nav">{renderTab()}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.07] bg-[#150408] pb-safe shadow-[0_-8px_24px_rgba(0,0,0,0.35)]">
-        <div className="max-w-md mx-auto flex justify-around px-2 py-2">
+        <div className="max-w-md mx-auto flex justify-around px-2 py-3">
           <TabButton
             icon={Compass}
             label="Descobrir"
