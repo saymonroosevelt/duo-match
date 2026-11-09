@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   CheckCircle,
   MapPin,
@@ -52,6 +52,28 @@ export default function Explore({
   const [toast, setToast] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [myCoords, setMyCoords] = useState<any>(null);
+  const [dragX, setDragX] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (processing) return;
+    touchStartX.current = event.touches[0].clientX;
+    setDragX(0);
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartX.current == null) return;
+    setDragX(event.touches[0].clientX - touchStartX.current);
+  };
+
+  const handleTouchEnd = () => {
+    const delta = dragX;
+    touchStartX.current = null;
+    if (Math.abs(delta) > 80) {
+      handleAction(delta > 0 ? 'like' : 'pass');
+    }
+    setDragX(0);
+  };
 
   useEffect(() => {
     if (!initialInterest) return;
@@ -421,7 +443,32 @@ export default function Explore({
         />
       ) : (
         <div className="max-w-md mx-auto">
-          <div className="relative h-[calc(100vh-310px)] min-h-[420px] max-h-[640px] rounded-[36px] overflow-hidden border border-white/10 shadow-2xl shadow-black/60 bg-[#1C1C1E]">
+          <div
+            className="relative h-[calc(100vh-310px)] min-h-[420px] max-h-[640px] rounded-[36px] overflow-hidden border border-white/10 shadow-2xl shadow-black/60 bg-[#1C1C1E] touch-pan-y select-none will-change-transform"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{
+              transform: `translateX(${dragX}px) rotate(${dragX * 0.045}deg)`,
+              transition: touchStartX.current == null ? 'transform 250ms ease-out' : 'none',
+            }}
+          >
+            {/* Selos de decisão durante o arrasto */}
+            <div
+              className="absolute top-16 left-5 z-20 rounded-xl border-2 border-emerald-400/80 px-4 py-2 text-lg font-black uppercase tracking-[0.2em] text-emerald-300 -rotate-12 pointer-events-none"
+              style={{ opacity: dragX > 0 ? Math.min(dragX / 100, 1) : 0 }}
+              aria-hidden="true"
+            >
+              Curtir
+            </div>
+            <div
+              className="absolute top-16 right-5 z-20 rounded-xl border-2 border-rose-500/80 px-4 py-2 text-lg font-black uppercase tracking-[0.2em] text-rose-300 rotate-12 pointer-events-none"
+              style={{ opacity: dragX < 0 ? Math.min(-dragX / 100, 1) : 0 }}
+              aria-hidden="true"
+            >
+              Passar
+            </div>
+
             {current.photo_url ? (
               <img
                 src={current.photo_url}
