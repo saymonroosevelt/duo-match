@@ -271,7 +271,6 @@ export default function PlansScreen({ user, onBack }) {
                       disabled={
                         selecting === plan.id ||
                         isCurrent ||
-                        isPending ||
                         (planState.subscription &&
                           isSubscriptionActive(planState.subscription) &&
                           planState.subscription.plan_id !== plan.id)
@@ -289,7 +288,9 @@ export default function PlansScreen({ user, onBack }) {
                       ) : isCurrent ? (
                         'Plano atual'
                       ) : isPending ? (
-                        'Plano selecionado'
+                        <>
+                          <CreditCard size={15} /> Ir para o pagamento
+                        </>
                       ) : (
                         <>
                           <CreditCard size={15} /> Escolher {plan.name}
