@@ -118,6 +118,7 @@ export default function OnboardingScreen({ session }) {
       what_procura: relationshipIntention,
       intentions: interests,
       photo_url: formData.photo_url || null,
+      photos: formData.photo_url ? [formData.photo_url] : [],
       status: 'pending',
       lgpd_accepted_at: new Date().toISOString(),
     });

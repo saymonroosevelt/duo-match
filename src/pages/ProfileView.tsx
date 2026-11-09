@@ -12,7 +12,7 @@ import {
   Heart,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { asArray, formatDate, isSubscriptionActive } from '../lib/helpers';
+import { asArray, formatDate, isSubscriptionActive, profilePhotos } from '../lib/helpers';
 import { PLAN_STATUS_LABELS } from '../lib/constants';
 import Avatar from '../components/Avatar';
 import usePlan from '../lib/usePlan';
@@ -37,6 +37,7 @@ export default function ProfileView({
   const planState = usePlan(profile?.id);
   const interests = asArray(profile?.intentions);
   const values = asArray(profile?.values_inegotiable);
+  const gallery = profilePhotos(profile);
   const active = isSubscriptionActive(planState.subscription);
 
   async function handleLogout() {
@@ -112,6 +113,36 @@ export default function ProfileView({
             )}
           </div>
         </section>
+
+        {gallery.length > 1 && (
+          <section className="mt-4">
+            <div className="flex items-center justify-between mb-2 px-1">
+              <h3 className="text-[10px] uppercase tracking-[0.2em] text-rose-100/40">
+                Suas fotos · {gallery.length}/5
+              </h3>
+              <button
+                type="button"
+                onClick={onEdit}
+                className="text-[10px] uppercase tracking-widest text-rose-300/60 hover:text-rose-200 transition-colors"
+              >
+                Editar galeria
+              </button>
+            </div>
+            <div className="flex gap-2.5 overflow-x-auto pb-1 snap-x">
+              {gallery.map((url: string) => (
+                <img
+                  key={url}
+                  src={url}
+                  alt="Foto do seu perfil"
+                  className="h-48 w-36 shrink-0 snap-start rounded-2xl object-cover border border-white/10 bg-white/[0.03]"
+                  onError={(event) => {
+                    (event.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="mt-4 rounded-3xl border border-white/[0.07] bg-white/[0.035] p-5">
           <div className="flex items-center gap-2 mb-2">

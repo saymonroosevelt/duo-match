@@ -158,6 +158,14 @@ export function friendlyError(error) {
   return message;
 }
 
+// Galeria de fotos do perfil (até 5). Fallback: perfis antigos só com photo_url.
+export function profilePhotos(profile) {
+  const list = asArray(profile?.photos);
+  if (list.length) return list.slice(0, 5);
+  const single = typeof profile?.photo_url === 'string' ? profile.photo_url.trim() : '';
+  return single ? [single] : [];
+}
+
 export function isPlanSelect(plan) {
   const slug = String(plan?.slug || '').toLowerCase();
   const name = String(plan?.name || '').toLowerCase();

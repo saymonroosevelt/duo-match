@@ -1,17 +1,50 @@
 import { useMemo, useRef, useState } from 'react';
-import { Camera, Loader2, MapPin, Save, Trash2 } from 'lucide-react';
+import {
+  Loader2,
+  MapPin,
+  Plus,
+  Save,
+  Star,
+  Trash2,
+} from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { captureAndSaveLocation } from '../lib/geo';
-import {
-  INTEREST_OPTIONS,
-  RELATIONSHIP_INTENTIONS,
-  VALUES_OPTIONS,
-} from '../lib/constants';
+import { RELATIONSHIP_INTENTIONS } from '../lib/constants';
 import { asArray, cleanText, clampInt, friendlyError } from '../lib/helpers';
-import { uploadAvatar } from '../lib/storage';
+import { deleteProfilePhoto, uploadProfilePhoto } from '../lib/storage';
 import Avatar from '../components/Avatar';
 import BackButton from '../components/BackButton';
 import Toast from '../components/Toast';
+
+const MAX_PHOTOS = 5;
+
+// Texto livre (vírgula, ponto e vírgula ou quebra de linha) → lista salva no perfil.
+function parseTextList(text: any) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const raw of String(text || '').split(/[\n,;]+/)) {
+    const clean = raw.trim().replace(/\s+/g, ' ');
+    if (!clean) continue;
+    const value = clean.slice(0, 80);
+    const key = value.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(value);
+    if (result.length >= 20) break;
+  }
+  return result;
+}
+
+function initialPhotos(profile: any) {
+  const fromArray = asArray(profile?.photos);
+  if (fromArray.length) return fromArray.slice(0, MAX_PHOTOS);
+  const single = typeof profile?.photo_url === 'string' ? profile.photo_url.trim() : '';
+  return single ? [single] : [];
+}
+
+function joinForEdit(list: any) {
+  return Array.isArray(list) ? list.filter(Boolean).join(', ') : '';
+}
 
 export default function EditProfile({
   profile,
@@ -24,15 +57,15 @@ export default function EditProfile({
 }) {
   const [form, setForm] = useState({
     full_name: profile?.full_name || '',
-    age: profile?.age || '',
+    age: profile?.age ?? '',
     city: profile?.city || '',
     bio: profile?.bio || '',
     what_procura: profile?.what_procura || '',
-    interests: asArray(profile?.intentions),
-    values: asArray(profile?.values_inegotiable),
-    photo_url: profile?.photo_url || '',
+    interestsText: joinForEdit(asArray(profile?.intentions)),
+    valuesText: joinForEdit(asArray(profile?.values_inegotiable)),
+    photos: initialPhotos(profile),
   });
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState(0);
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
   const [locationMessage, setLocationMessage] = useState('');
@@ -48,37 +81,64 @@ export default function EditProfile({
     return options;
   }, [form.what_procura]);
 
-  function update(key, value) {
+  const parsedInterests = useMemo(
+    () => parseTextList(form.interestsText),
+    [form.interestsText],
+  );
+  const parsedValues = useMemo(
+    () => parseTextList(form.valuesText),
+    [form.valuesText],
+  );
+
+  function update(key: string, value: any) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function toggleArray(key, value) {
-    setForm((prev) => {
-      const current = prev[key];
-      return {
-        ...prev,
-        [key]: current.includes(value)
-          ? current.filter((item) => item !== value)
-          : [...current, value],
-      };
-    });
+  async function handlePhotos(event: any) {
+    const input = (event?.target || event?.currentTarget) as HTMLInputElement | null;
+    const fileList = input?.files;
+    const files: File[] = [];
+    if (fileList) {
+      for (let index = 0; index < fileList.length; index += 1) {
+        files.push(fileList.item(index) as File);
+      }
+    }
+    if (input) input.value = '';
+    const remaining = MAX_PHOTOS - form.photos.length;
+    if (!files.length || remaining <= 0) return;
+
+    const queue = files.slice(0, remaining);
+    setUploading(queue.length);
+    setError('');
+
+    for (const file of queue) {
+      try {
+        const url = await uploadProfilePhoto(file, profile.id);
+        setForm((prev) => ({
+          ...prev,
+          photos: [...prev.photos, url].slice(0, MAX_PHOTOS),
+        }));
+      } catch (uploadError) {
+        setError(friendlyError(uploadError));
+      } finally {
+        setUploading((count) => Math.max(0, count - 1));
+      }
+    }
   }
 
-  async function handlePhoto(event) {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
+  function removePhoto(url: string) {
+    setForm((prev) => ({
+      ...prev,
+      photos: prev.photos.filter((photo) => photo !== url),
+    }));
+    deleteProfilePhoto(url); // melhor esforço — nunca bloqueia o salvar
+  }
 
-    setUploading(true);
-    setError('');
-    try {
-      const url = await uploadAvatar(file, profile.id);
-      update('photo_url', url);
-    } catch (uploadError) {
-      setError(friendlyError(uploadError));
-    } finally {
-      setUploading(false);
-    }
+  function makePrimary(url: string) {
+    setForm((prev) => ({
+      ...prev,
+      photos: [url, ...prev.photos.filter((photo) => photo !== url)],
+    }));
   }
 
   async function handleUseLocation() {
@@ -97,11 +157,11 @@ export default function EditProfile({
     setLocationMessage(
       result.ok
         ? 'Sua localização foi salva. Ela será usada só para mostrar a distância aos membros aprovados.'
-        : result.message,
+        : result.message || 'N�o foi poss�vel salvar a localiza��o.',
     );
   }
 
-  async function handleSave(event) {
+  async function handleSave(event?: any) {
     event?.preventDefault();
     if (saving) return;
 
@@ -131,9 +191,10 @@ export default function EditProfile({
       city,
       bio,
       what_procura: form.what_procura,
-      intentions: form.interests,
-      values_inegotiable: form.values,
-      photo_url: form.photo_url || null,
+      intentions: parsedInterests,
+      values_inegotiable: parsedValues,
+      photos: form.photos,
+      photo_url: form.photos[0] || null,
     };
 
     const { data, error: saveError } = await supabase
@@ -165,42 +226,112 @@ export default function EditProfile({
       </header>
 
       <form onSubmit={handleSave} className="max-w-md mx-auto px-5 pt-6 pb-32">
-        <div className="flex flex-col items-center mb-7">
-          <div className="relative">
-            <Avatar src={form.photo_url} name={form.full_name} size="xl" />
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              disabled={uploading}
-              className="absolute -bottom-1 -right-1 w-11 h-11 rounded-full bg-[#f4ece8] text-[#3a1c1c] flex items-center justify-center border-4 border-[#0a0000] disabled:opacity-60"
-              aria-label="Enviar foto"
-            >
-              {uploading ? (
-                <Loader2 size={17} className="animate-spin" />
-              ) : (
-                <Camera size={17} />
-              )}
-            </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handlePhoto}
-            />
+        {/* Galeria de fotos — até 5, a primeira é a foto principal */}
+        <div className="mb-7">
+          <div className="flex items-center justify-between mb-2.5">
+            <span className="text-xs text-rose-100/55 ml-1">
+              Suas fotos{' '}
+              <span className="text-rose-100/30">
+                · {form.photos.length}/{MAX_PHOTOS}
+              </span>
+            </span>
+            <span className="text-[9px] uppercase tracking-[0.18em] text-rose-100/30">
+              a 1ª é a principal
+            </span>
           </div>
-          <p className="text-[10px] text-rose-100/30 mt-3 text-center">
-            Foto pública para membros aprovados · até 5 MB
+
+          <div className="grid grid-cols-5 gap-2">
+            {form.photos.map((photo, index) => (
+              <div
+                key={photo}
+                className={`relative aspect-[3/4] overflow-hidden rounded-2xl border bg-white/[0.03] ${
+                  index === 0 ? 'border-rose-400/60' : 'border-white/10'
+                }`}
+              >
+                <img
+                  src={photo}
+                  alt={`Foto ${index + 1} do perfil`}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  onError={(event) => {
+                    (event.target as HTMLImageElement).style.opacity = '0.25';
+                  }}
+                />
+                {index === 0 ? (
+                  <span className="absolute top-1.5 left-1.5 rounded-full bg-rose-500/90 px-1.5 py-0.5 text-[7px] font-semibold uppercase tracking-[0.18em] text-white">
+                    Principal
+                  </span>
+                ) : null}
+                <div className="absolute bottom-1.5 right-1.5 flex gap-1">
+                  {index !== 0 && (
+                    <button
+                      type="button"
+                      onClick={() => makePrimary(photo)}
+                      aria-label="Definir como foto principal"
+                      title="Definir como principal"
+                      className="w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center text-amber-300 hover:text-amber-200"
+                    >
+                      <Star size={11} />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(photo)}
+                    aria-label="Remover foto"
+                    title="Remover foto"
+                    className="w-6 h-6 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center text-rose-200/80 hover:text-white"
+                  >
+                    <Trash2 size={11} />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {form.photos.length < MAX_PHOTOS && (
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading > 0}
+                className="relative aspect-[3/4] rounded-2xl border border-dashed border-white/20 bg-white/[0.02] flex flex-col items-center justify-center gap-1 text-rose-100/45 hover:border-rose-400/50 hover:text-rose-100/75 transition-colors disabled:opacity-60"
+              >
+                {uploading > 0 ? (
+                  <Loader2 size={17} className="animate-spin" />
+                ) : (
+                  <Plus size={19} />
+                )}
+                <span className="text-[8px] uppercase tracking-[0.2em]">
+                  {uploading > 0 ? `Enviando ${uploading}` : 'Adicionar'}
+                </span>
+              </button>
+            )}
+          </div>
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handlePhotos}
+          />
+          <p className="mt-2.5 text-center text-[10px] leading-relaxed text-rose-100/30">
+            Adicione até 5 fotos. A primeira é a foto principal exibida no app ·
+            até 5 MB por foto. Toque na estrela para escolher qual é a principal.
           </p>
-          {form.photo_url && (
-            <button
-              type="button"
-              onClick={() => update('photo_url', '')}
-              className="mt-2 inline-flex items-center gap-1 text-[10px] text-red-300/60 hover:text-red-200"
-            >
-              <Trash2 size={11} /> Remover foto
-            </button>
-          )}
+        </div>
+
+        {/* Avatar de pré-visualização da foto principal */}
+        <div className="flex items-center gap-4 mb-6 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3">
+          <Avatar src={form.photos[0] || ''} name={form.full_name} size="md" />
+          <div className="min-w-0">
+            <p className="text-[11px] text-rose-100/70 leading-snug">
+              É assim que os membros aprovados verão a sua foto principal.
+            </p>
+            <p className="text-[9px] uppercase tracking-widest text-rose-100/30 mt-1">
+              {form.photos.length > 0
+                ? `${form.photos.length} foto${form.photos.length > 1 ? 's' : ''} na galeria`
+                : 'Nenhuma foto ainda'}
+            </p>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -291,53 +422,64 @@ export default function EditProfile({
             </select>
           </label>
 
+          {/* Interesses — texto livre */}
           <div>
             <span className="text-xs text-rose-100/55 ml-1">Interesses</span>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {INTEREST_OPTIONS.map((interest) => {
-                const selected = form.interests.includes(interest);
-                return (
-                  <button
+            <textarea
+              value={form.interestsText}
+              onChange={(event) => update('interestsText', event.target.value)}
+              rows={3}
+              maxLength={600}
+              className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white placeholder:text-rose-100/25 focus:outline-none focus:border-rose-500/40 resize-none"
+              placeholder="Escreva livremente, do seu jeito..."
+            />
+            <p className="mt-1.5 ml-1 text-[10px] text-rose-100/35 leading-relaxed">
+              Sem lista fechada: escreva o que você quiser — separando por vírgula
+              ou quebrando linhas, se preferir.
+            </p>
+            {parsedInterests.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {parsedInterests.map((interest) => (
+                  <span
                     key={interest}
-                    type="button"
-                    onClick={() => toggleArray('interests', interest)}
-                    className={`rounded-full border px-3.5 py-2 text-xs transition-colors ${
-                      selected
-                        ? 'border-rose-400 bg-rose-500/15 text-white'
-                        : 'border-white/10 bg-white/[0.04] text-rose-100/55'
-                    }`}
+                    className="rounded-full border border-rose-400/25 bg-rose-500/10 px-2.5 py-1 text-[10px] text-rose-100/85"
                   >
                     {interest}
-                  </button>
-                );
-              })}
-            </div>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
+          {/* Valores inegociáveis — texto livre */}
           <div>
-            <span className="text-xs text-rose-100/55 ml-1">
-              Valores inegociáveis
-            </span>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {VALUES_OPTIONS.map((value) => {
-                const selected = form.values.includes(value);
-                return (
-                  <button
+            <span className="text-xs text-rose-100/55 ml-1">Valores inegociáveis</span>
+            <textarea
+              value={form.valuesText}
+              onChange={(event) => update('valuesText', event.target.value)}
+              rows={3}
+              maxLength={600}
+              className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white placeholder:text-rose-100/25 focus:outline-none focus:border-rose-500/40 resize-none"
+              placeholder="Escreva livremente, do seu jeito..."
+            />
+            <p className="mt-1.5 ml-1 text-[10px] text-rose-100/35 leading-relaxed">
+              Escreva o que é essencial para você em um relacionamento — sem
+              opções fixas.
+            </p>
+            {parsedValues.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {parsedValues.map((value) => (
+                  <span
                     key={value}
-                    type="button"
-                    onClick={() => toggleArray('values', value)}
-                    className={`rounded-full border px-3.5 py-2 text-xs transition-colors ${
-                      selected
-                        ? 'border-rose-400 bg-rose-500/15 text-white'
-                        : 'border-white/10 bg-white/[0.04] text-rose-100/55'
-                    }`}
+                    className="rounded-full border border-rose-400/25 bg-rose-500/10 px-2.5 py-1 text-[10px] text-rose-100/85"
                   >
                     {value}
-                  </button>
-                );
-              })}
-            </div>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
+
         </div>
 
         {error && (
@@ -352,7 +494,7 @@ export default function EditProfile({
           <button
             type="button"
             onClick={handleSave}
-            disabled={saving || uploading}
+            disabled={saving || uploading > 0}
             className="w-full rounded-full bg-[#f4ece8] py-4 text-sm font-semibold text-[#3a1c1c] hover:bg-white disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2"
           >
             {saving ? (
