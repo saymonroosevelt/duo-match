@@ -24,6 +24,8 @@ import Chat from './pages/Chat';
 import EditProfile from './pages/EditProfile';
 import PlansScreen from './pages/PlansScreen';
 import PrivacyScreen from './pages/PrivacyScreen';
+import PaywallScreen from './pages/PaywallScreen';
+import { ADMIN_EMAIL, isAdminUser, isPaidSubscription, fetchMySubscription } from './lib/permissions';
 
 // Dedupe global: o mesmo userId nunca dispara 2 queries de perfil em paralelo
 // (getSession + evento SIGNED_IN chegavam juntos e duplicavam a espera).
@@ -67,6 +69,7 @@ function App() {
   const [currentScreen, setCurrentScreen] = useState('welcome');
   const [authMode, setAuthMode] = useState('login');
   const [profileStuck, setProfileStuck] = useState(false);
+  const [subscription, setSubscription] = useState(undefined);
 
   const params = new URLSearchParams(window.location.search);
   const isAdminRoute = params.get('admin') === 'true';
@@ -146,6 +149,27 @@ function App() {
     // O perfil é lido apenas na troca de sessão; edições usam refreshProfile.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProfile]);
+
+  // Assinatura do usuário (undefined = carregando, null = sem assinatura)
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId) {
+      setSubscription(null);
+      return;
+    }
+    let active = true;
+    fetchMySubscription(supabase, userId).then((row) => {
+      if (active) setSubscription(row || null);
+    });
+    return () => {
+      active = false;
+    };
+  }, [session]);
+
+  const isAdmin = isAdminUser(session);
+  const isPaid = isPaidSubscription(subscription);
+  // Admin exclusivo e assinante ativo têm acesso total; não pagantes veem o paywall.
+  const premiumOk = isPaid || isAdmin;
 
   // Captura 1x por sessão a geolocalização do usuário logado (só com GPS permitido).
   // Negar o GPS nunca trava o app — apenas segue sem distância.
@@ -295,7 +319,7 @@ function App() {
 
   // Rota administrativa direta
   if (isAdminRoute) {
-    if (profile.role === 'admin') {
+    if (isAdmin) {
       return (
         <AdminPanel
           onBack={() => {
@@ -307,8 +331,16 @@ function App() {
     return <AdminDenied />;
   }
 
-  // Conversa aberta
+  // Conversa aberta — exige assinatura ativa (ou admin)
   if (activeChat) {
+    if (!premiumOk) {
+      return (
+        <PaywallScreen
+          onOpenPlans={() => setOverlay('plans')}
+          onOpenProfile={() => setActiveTab('profile')}
+        />
+      );
+    }
     return (
       <Chat
         matchId={activeChat.matchId}
@@ -355,7 +387,7 @@ function App() {
       );
     }
 
-    if (overlay === 'admin' && profile.role === 'admin') {
+    if (overlay === 'admin' && isAdmin) {
       return <AdminPanel onBack={() => setOverlay(null)} />;
     }
   }
@@ -363,6 +395,14 @@ function App() {
   function renderTab() {
     switch (activeTab) {
       case 'matches':
+        if (!premiumOk) {
+          return (
+            <PaywallScreen
+              onOpenPlans={() => setOverlay('plans')}
+              onOpenProfile={() => setActiveTab('profile')}
+            />
+          );
+        }
         return (
           <Matches
             onSelectMatch={(matchId, otherUser) =>
@@ -373,6 +413,14 @@ function App() {
           />
         );
       case 'messages':
+        if (!premiumOk) {
+          return (
+            <PaywallScreen
+              onOpenPlans={() => setOverlay('plans')}
+              onOpenProfile={() => setActiveTab('profile')}
+            />
+          );
+        }
         return (
           <Messages
             onSelectMatch={(matchId, otherUser) =>
@@ -385,18 +433,27 @@ function App() {
         return (
           <ProfileView
             profile={profile}
+            isAdmin={isAdmin}
             onEdit={() => setOverlay('editProfile')}
             onOpenPlans={() => setOverlay('plans')}
             onOpenInterests={() => setOverlay('interests')}
             onOpenPrivacy={() => setOverlay('privacy')}
             onOpenAdmin={
-              profile.role === 'admin'
+              isAdmin
                 ? () => setOverlay('admin')
                 : undefined
             }
           />
         );
       default:
+        if (!premiumOk) {
+          return (
+            <PaywallScreen
+              onOpenPlans={() => setOverlay('plans')}
+              onOpenProfile={() => setActiveTab('profile')}
+            />
+          );
+        }
         return (
           <Explore
             initialInterest={exploreInterest}
@@ -433,7 +490,7 @@ function App() {
           </button>
 
           <div className="flex items-center gap-2">
-            {profile.role === 'admin' && (
+            {isAdmin && (
               <button
                 type="button"
                 onClick={() => setOverlay('admin')}

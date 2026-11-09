@@ -24,6 +24,7 @@ export default function ProfileView({
   onOpenInterests,
   onOpenPrivacy,
   onOpenAdmin,
+  isAdmin = false,
 }: {
   profile: any;
   onEdit: () => void;
@@ -31,11 +32,11 @@ export default function ProfileView({
   onOpenInterests: () => void;
   onOpenPrivacy: () => void;
   onOpenAdmin?: () => void;
+  isAdmin?: boolean;
 }) {
   const planState = usePlan(profile?.id);
   const interests = asArray(profile?.intentions);
   const values = asArray(profile?.values_inegotiable);
-  const isAdmin = profile?.role === 'admin';
   const active = isSubscriptionActive(planState.subscription);
 
   async function handleLogout() {
