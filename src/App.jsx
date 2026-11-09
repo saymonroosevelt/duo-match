@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Compass,
   Heart,
-  MessageCircle,
   ShieldAlert,
   User,
   Users,
@@ -17,7 +16,6 @@ import RejectedApproval from './pages/RejectedApproval';
 import AdminPanel from './pages/AdminPanel';
 import Explore from './pages/Explore';
 import Matches from './pages/Matches';
-import Messages from './pages/Messages';
 import ProfileView from './pages/ProfileView';
 import Interests from './pages/Interests';
 import Chat from './pages/Chat';
@@ -412,23 +410,6 @@ function App() {
             onGoExplore={() => setActiveTab('explore')}
           />
         );
-      case 'messages':
-        if (!premiumOk) {
-          return (
-            <PaywallScreen
-              onOpenPlans={() => setOverlay('plans')}
-              onOpenProfile={() => setActiveTab('profile')}
-            />
-          );
-        }
-        return (
-          <Messages
-            onSelectMatch={(matchId, otherUser) =>
-              setActiveChat({ matchId, otherUser })
-            }
-            onGoExplore={() => setActiveTab('explore')}
-          />
-        );
       case 'profile':
         return (
           <ProfileView
@@ -530,15 +511,6 @@ function App() {
             active={activeTab === 'matches'}
             onClick={() => {
               setActiveTab('matches');
-              window.scrollTo(0, 0);
-            }}
-          />
-          <TabButton
-            icon={MessageCircle}
-            label="Mensagens"
-            active={activeTab === 'messages'}
-            onClick={() => {
-              setActiveTab('messages');
               window.scrollTo(0, 0);
             }}
           />

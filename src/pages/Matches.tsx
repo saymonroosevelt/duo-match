@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Heart,
   ChevronRight,
@@ -31,6 +31,19 @@ export default function Matches({
   const planState = usePlan(userId);
   const [toast, setToast] = useState<any>(null);
   const [matchingId, setMatchingId] = useState<number | null>(null);
+
+  const orderedMatches = useMemo(
+    () =>
+      [...matches].sort((a, b) => {
+        if ((b.unread || 0) !== (a.unread || 0)) {
+          return (b.unread || 0) - (a.unread || 0);
+        }
+        const aTime = new Date(a.lastMessage?.created_at || a.createdAt).getTime();
+        const bTime = new Date(b.lastMessage?.created_at || b.createdAt).getTime();
+        return bTime - aTime;
+      }),
+    [matches],
+  );
 
   const selectUnlocked = isSubscriptionActive(planState.subscription);
 
@@ -186,7 +199,7 @@ export default function Matches({
           />
         ) : (
           <div className="space-y-2.5">
-            {matches.map((match) => {
+            {orderedMatches.map((match) => {
               const other = match.otherUser || {};
               return (
                 <button
