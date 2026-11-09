@@ -69,7 +69,7 @@ function App() {
   const [profileStuck, setProfileStuck] = useState(false);
   const [subscription, setSubscription] = useState(undefined);
 
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.search || '');
   const isAdminRoute = params.get('admin') === 'true';
   const isLegalRoute = params.get('legal') === '1' || params.get('legal') === 'true';
   const wantsPlan = params.get('plan') === '1';

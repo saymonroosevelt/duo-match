@@ -1,18 +1,30 @@
 import { Component } from 'react';
 
 // Captura qualquer erro de renderização do React e evita tela preta/branca vazia.
+// Detalhes do erro ficam salvos para copiar e enviar à curadoria.
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, message: '' };
+    this.state = {
+      hasError: false,
+      message: '',
+      componentStack: '',
+      copied: false,
+    };
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true, message: String(error?.message || error || 'Erro inesperado') };
+    return {
+      hasError: true,
+      message: String(error?.message || error || 'Erro inesperado'),
+    };
   }
 
   componentDidCatch(error, info) {
     console.error('ErrorBoundary capturou:', error, info?.componentStack);
+    this.setState({
+      componentStack: String(info?.componentStack || ''),
+    });
   }
 
   handleReload = () => {
@@ -21,6 +33,33 @@ export default class ErrorBoundary extends Component {
 
   handleGoHome = () => {
     window.location.assign('/');
+  };
+
+  handleCopyDetails = async () => {
+    const details = [
+      'Duo Match — detalhes do erro',
+      `Mensagem: ${this.state.message || '(sem mensagem)'}`,
+      '',
+      `Componentes:\n${this.state.componentStack || '(não disponível)'}`,
+      '',
+      `URL: ${window.location.href}`,
+      `User-Agent: ${navigator.userAgent}`,
+    ].join('\n');
+
+    try {
+      await navigator.clipboard?.writeText(details);
+    } catch {
+      const input = document.createElement('textarea');
+      input.value = details;
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+    }
+    this.setState({ copied: true });
+    window.setTimeout(() => this.setState({ copied: false }), 2500);
   };
 
   render() {
@@ -56,16 +95,26 @@ export default class ErrorBoundary extends Component {
           >
             Recarregar o app
           </button>
-          <button
-            type="button"
-            onClick={this.handleGoHome}
-            className="text-xs text-rose-200/55 underline underline-offset-4 hover:text-rose-100"
-          >
-            Voltar ao início
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={this.handleGoHome}
+              className="text-xs text-rose-200/55 underline underline-offset-4 hover:text-rose-100"
+            >
+              Voltar ao início
+            </button>
+            <span className="text-rose-100/15">·</span>
+            <button
+              type="button"
+              onClick={this.handleCopyDetails}
+              className="text-xs text-rose-200/55 underline underline-offset-4 hover:text-rose-100"
+            >
+              {this.state.copied ? 'Detalhes copiados' : 'Copiar detalhes'}
+            </button>
+          </div>
         </div>
       );
     }
-    return this.props.children;
+    return this.props?.children ?? null;
   }
 }

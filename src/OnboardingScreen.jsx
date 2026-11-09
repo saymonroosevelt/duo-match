@@ -33,7 +33,7 @@ export default function OnboardingScreen({ session }) {
     relationship_intention: '',
     interests: [],
   });
-  const fileRef = useRef<HTMLInputElement | null>(null);
+  const fileRef = useRef(null);
 
   function updateForm(key, value) {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -52,16 +52,21 @@ export default function OnboardingScreen({ session }) {
   }
 
   async function handlePhoto(event) {
-    const file = event.target.files?.[0];
-    event.target.value = '';
+    const userId = session?.user?.id;
+    if (!userId) {
+      setError('Sua sessão expirou. Recarregue a página e entre novamente.');
+      return;
+    }
+    const file = event?.target?.files?.[0];
+    if (event?.target) event.target.value = '';
     if (!file) return;
 
     setUploading(true);
     setError('');
     setPhotoWarning('');
     try {
-      const url = await uploadAvatar(file, session.user.id);
-      updateForm('photo_url', url);
+      const url = await uploadAvatar(file, userId);
+      if (url) updateForm('photo_url', url);
     } catch (uploadError) {
       setPhotoWarning(friendlyError(uploadError));
     } finally {
@@ -72,10 +77,18 @@ export default function OnboardingScreen({ session }) {
   async function handleSaveProfile() {
     if (loading) return;
 
-    const cleanName = cleanText(formData.full_name, 80);
-    const cleanCity = cleanText(formData.city, 80);
-    const cleanBio = cleanText(formData.bio, 500);
-    const age = clampInt(formData.age, 18, 99, NaN);
+    const userId = session?.user?.id;
+    if (!userId) {
+      setError('Sua sessão expirou. Recarregue a página e entre novamente.');
+      return;
+    }
+
+    const cleanName = cleanText(formData?.full_name, 80);
+    const cleanCity = cleanText(formData?.city, 80);
+    const cleanBio = cleanText(formData?.bio, 500);
+    const age = clampInt(formData?.age, 18, 99, NaN);
+    const relationshipIntention = formData?.relationship_intention || '';
+    const interests = Array.isArray(formData?.interests) ? formData.interests : [];
     if (!cleanName || !cleanCity) {
       setError('Preencha nome e cidade para continuar.');
       return;
@@ -84,11 +97,11 @@ export default function OnboardingScreen({ session }) {
       setError('A idade precisa estar entre 18 e 99 anos.');
       return;
     }
-    if (!formData.relationship_intention) {
+    if (!relationshipIntention) {
       setError('Escolha o que você está procurando construir.');
       return;
     }
-    if (formData.interests.length === 0) {
+    if (interests.length === 0) {
       setError('Selecione pelo menos um interesse.');
       return;
     }
@@ -97,13 +110,13 @@ export default function OnboardingScreen({ session }) {
     setError('');
 
     const { error: saveError } = await supabase.from('profiles').upsert({
-      id: session.user.id,
+      id: userId,
       full_name: cleanName,
       age,
       city: cleanCity,
       bio: cleanBio,
-      what_procura: formData.relationship_intention,
-      intentions: formData.interests,
+      what_procura: relationshipIntention,
+      intentions: interests,
       photo_url: formData.photo_url || null,
       status: 'pending',
       lgpd_accepted_at: new Date().toISOString(),
