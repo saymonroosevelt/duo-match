@@ -25,7 +25,7 @@ import EditProfile from './pages/EditProfile';
 import PlansScreen from './pages/PlansScreen';
 import PrivacyScreen from './pages/PrivacyScreen';
 import PaywallScreen from './pages/PaywallScreen';
-import { ADMIN_EMAIL, isAdminUser, isPaidSubscription, fetchMySubscription } from './lib/permissions';
+import { isAdminUser, isPaidSubscription, fetchMySubscription } from './lib/permissions';
 
 // Dedupe global: o mesmo userId nunca dispara 2 queries de perfil em paralelo
 // (getSession + evento SIGNED_IN chegavam juntos e duplicavam a espera).

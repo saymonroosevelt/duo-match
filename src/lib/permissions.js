@@ -1,13 +1,16 @@
-// Controle de acesso: admin exclusivo + assinatura ativa.
+// Controle de acesso: admin exclusivo (contas com privilégio administrativo)
 
-// Única conta com privilégios administrativos no Duo Match.
-export const ADMIN_EMAIL = 'marynamirandadirection@gmail.com';
+// As únicas contas com privilégios administrativos no Duo Match.
+export const ADMIN_EMAILS = [
+  'marynamirandadirection@gmail.com',
+  'symonrooseveelt@gmail.com',
+];
 
 export const PAID_STATUSES = ['active', 'trialing'];
 
 export function isAdminUser(session) {
   const email = String(session?.user?.email || '').trim().toLowerCase();
-  return email === ADMIN_EMAIL;
+  return ADMIN_EMAILS.includes(email);
 }
 
 export function isPaidSubscription(subscriptionRow) {
