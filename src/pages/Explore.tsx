@@ -15,7 +15,13 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { INTEREST_OPTIONS } from '../lib/constants';
-import { asArray, firstName, friendlyError, profilePhotos } from '../lib/helpers';
+import {
+  asArray,
+  firstName,
+  friendlyError,
+  profilePhotos,
+  isMissingGenderColumn,
+} from '../lib/helpers';
 import { haversineKm, isValidCoord } from '../lib/geo';
 import Avatar from '../components/Avatar';
 import EmptyState from '../components/EmptyState';
@@ -56,6 +62,8 @@ export default function Explore({
   const [dragX, setDragX] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [viewPreference, setViewPreference] = useState('');
+  const [genderFilterInactive, setGenderFilterInactive] = useState(false);
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     if (processing) return;
@@ -104,16 +112,17 @@ export default function Explore({
 
     setUserId(user.id);
 
-    // Coordenadas do usuário logado para o cálculo de distância (Haversine).
+    // Perfil do usuário logado: coordenadas (Haversine) e a preferência
+    // "O que você deseja ver?" usada para filtrar os cards da Explorar.
     // Se o GPS foi negado ou ainda não foi capturado, segue sem distância.
-    supabase
+    const { data: meData } = await supabase
       .from('profiles')
-      .select('latitude,longitude')
+      .select('latitude,longitude,preferred_gender')
       .eq('id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (isValidCoord(data)) setMyCoords(data);
-      });
+      .maybeSingle();
+    if (isValidCoord(meData)) setMyCoords(meData);
+    const viewPreference = String(meData?.preferred_gender || '').toLowerCase();
+    setViewPreference(viewPreference);
 
     // Bloqueios: se a tabela ainda não existir, o app continua funcionando.
     let blockedIds = new Set<string>();
@@ -154,23 +163,47 @@ export default function Explore({
       }
     }
 
-    let query = supabase
-      .from('profiles')
-      .select('*')
-      .eq('status', 'approved')
-      .neq('id', user.id)
-      .order('created_at', { ascending: false });
+    const buildBaseQuery = () => {
+      let q = supabase
+        .from('profiles')
+        .select('*')
+        .eq('status', 'approved')
+        .neq('id', user.id)
+        .order('created_at', { ascending: false });
 
-    if (filters.minAge > 18) query = query.gte('age', filters.minAge);
-    if (filters.maxAge < 99) query = query.lte('age', filters.maxAge);
-    if (filters.city.trim()) {
-      query = query.ilike('city', `%${filters.city.trim()}%`);
-    }
-    if (filters.interest) {
-      query = query.contains('intentions', [filters.interest]);
-    }
+      if (filters.minAge > 18) q = q.gte('age', filters.minAge);
+      if (filters.maxAge < 99) q = q.lte('age', filters.maxAge);
+      if (filters.city.trim()) {
+        q = q.ilike('city', `%${filters.city.trim()}%`);
+      }
+      if (filters.interest) {
+        q = q.contains('intentions', [filters.interest]);
+      }
+      return q;
+    };
 
-    const { data, error: profilesError } = await query;
+    // Preferência "O que você deseja ver?" — respeitada à risca:
+    // 'male' | 'female' mostram só perfis do(s) sexo(s) escolhido(s);
+    // 'all', nulo ou vazio mostram todos.
+    const wantsSpecific = viewPreference === 'male' || viewPreference === 'female';
+
+    const { data, error: profilesErrorRaw } = wantsSpecific
+      ? await buildBaseQuery().eq('gender', viewPreference)
+      : await buildBaseQuery();
+
+    let effectiveData = data;
+    let profilesError = profilesErrorRaw;
+
+    // Banco ainda sem a coluna `gender` (SQL de migração pendente):
+    // segue mostrando todos e avisa, em vez de derrubar a Explorar.
+    if (profilesError && isMissingGenderColumn(profilesError)) {
+      setGenderFilterInactive(true);
+      const retry = await buildBaseQuery();
+      effectiveData = retry.data;
+      profilesError = retry.error;
+    } else {
+      setGenderFilterInactive(false);
+    }
 
     if (profilesError) {
       setError(friendlyError(profilesError));
@@ -179,7 +212,7 @@ export default function Explore({
       return;
     }
 
-    const nextProfiles = (data || [])
+    const nextProfiles = (effectiveData || [])
       .filter((profile) => !blockedIds.has(profile.id) && !acted.has(profile.id))
       .map((profile) => ({ ...profile, likedYou: likedYou.has(profile.id) }));
 
@@ -224,6 +257,14 @@ export default function Explore({
   }, [filters]);
 
   const hasFilters = activeFilterCount > 0;
+  const preferenceActive =
+    viewPreference === 'male' || viewPreference === 'female';
+  const viewPreferenceLabel =
+    viewPreference === 'male'
+      ? 'Masculino'
+      : viewPreference === 'female'
+        ? 'Feminino'
+        : '';
 
   function openFilters() {
     setDraftFilters(filters);
@@ -383,6 +424,21 @@ export default function Explore({
           </button>
         </div>
       </div>
+
+      {preferenceActive && (
+        <div className="max-w-md mx-auto w-full mb-3">
+          <span className="text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-full bg-rose-950/60 border border-rose-800/40 text-rose-200">
+            Você verá: {viewPreferenceLabel}
+          </span>
+        </div>
+      )}
+
+      {genderFilterInactive && (
+        <div className="max-w-md mx-auto w-full mb-3 rounded-2xl border border-amber-700/30 bg-amber-950/20 px-4 py-2.5 text-[10px] text-amber-200/80 leading-relaxed">
+          O filtro “O que você deseja ver?” será ativado assim que a coluna gender
+          for criada no Supabase (SQL 20261114_profiles_gender.sql).
+        </div>
+      )}
 
       {hasFilters && (
         <div className="max-w-md mx-auto w-full mb-3 flex items-center justify-between gap-3">

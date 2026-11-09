@@ -12,8 +12,9 @@ import { supabase } from './lib/supabase';
 import {
   INTEREST_OPTIONS,
   RELATIONSHIP_INTENTIONS,
+  GENDER_OPTIONS,
 } from './lib/constants';
-import { friendlyError, cleanText, clampInt } from './lib/helpers';
+import { friendlyError, cleanText, clampInt, isMissingGenderColumn } from './lib/helpers';
 import { uploadAvatar } from './lib/storage';
 import Avatar from './components/Avatar';
 
@@ -24,6 +25,7 @@ export default function OnboardingScreen({ session }) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [photoWarning, setPhotoWarning] = useState('');
+  const [genderPending, setGenderPending] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',
     age: '',
@@ -32,6 +34,7 @@ export default function OnboardingScreen({ session }) {
     photo_url: '',
     relationship_intention: '',
     interests: [],
+    gender: '',
   });
   const fileRef = useRef(null);
 
@@ -89,12 +92,17 @@ export default function OnboardingScreen({ session }) {
     const age = clampInt(formData?.age, 18, 99, NaN);
     const relationshipIntention = formData?.relationship_intention || '';
     const interests = Array.isArray(formData?.interests) ? formData.interests : [];
+    const gender = formData?.gender || '';
     if (!cleanName || !cleanCity) {
       setError('Preencha nome e cidade para continuar.');
       return;
     }
     if (!Number.isFinite(age)) {
       setError('A idade precisa estar entre 18 e 99 anos.');
+      return;
+    }
+    if (!gender) {
+      setError('Escolha o seu gênero para continuar.');
       return;
     }
     if (!relationshipIntention) {
@@ -109,7 +117,7 @@ export default function OnboardingScreen({ session }) {
     setLoading(true);
     setError('');
 
-    const { error: saveError } = await supabase.from('profiles').upsert({
+    const payload = {
       id: userId,
       full_name: cleanName,
       age,
@@ -117,11 +125,20 @@ export default function OnboardingScreen({ session }) {
       bio: cleanBio,
       what_procura: relationshipIntention,
       intentions: interests,
+      gender,
       photo_url: formData.photo_url || null,
       photos: formData.photo_url ? [formData.photo_url] : [],
       status: 'pending',
       lgpd_accepted_at: new Date().toISOString(),
-    });
+    };
+
+    // Tolerante a banco ainda sem a coluna `gender` (SQL de migração pendente)
+    let { error: saveError } = await supabase.from('profiles').upsert(payload);
+    if (saveError && isMissingGenderColumn(saveError)) {
+      const { gender: _gender, ...withoutGender } = payload;
+      ({ error: saveError } = await supabase.from('profiles').upsert(withoutGender));
+      if (!saveError) setGenderPending(true);
+    }
 
     setLoading(false);
 
@@ -147,6 +164,13 @@ export default function OnboardingScreen({ session }) {
             Recebemos seus dados. Nossa equipe avalia cada perfil manualmente antes
             de liberar o acesso ao Descobrir, matches e conversas.
           </p>
+          {genderPending && (
+            <p className="mb-6 rounded-2xl border border-amber-700/30 bg-amber-950/20 px-4 py-3 text-[11px] text-amber-200/80 leading-relaxed">
+              Sua conta foi criada, mas a coluna de gênero ainda não foi criada no
+              banco do Supabase. Rode o SQL de migração (20261114_profiles_gender.sql)
+              para ativar o gênero e o filtro.
+            </p>
+          )}
           <button
             type="button"
             onClick={() => window.location.reload()}
@@ -280,6 +304,29 @@ export default function OnboardingScreen({ session }) {
                   placeholder="Florianópolis, SC"
                 />
               </label>
+            </div>
+
+            <div>
+              <span className="text-xs text-rose-100/55 ml-1">Seu gênero</span>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {GENDER_OPTIONS.map((option) => {
+                  const selected = formData.gender === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => updateForm('gender', option.value)}
+                      className={`p-4 rounded-2xl border transition-all text-sm ${
+                        selected
+                          ? 'border-rose-400 bg-rose-500/10 text-white'
+                          : 'border-white/10 bg-white/[0.03] text-rose-100/60'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <label className="block">

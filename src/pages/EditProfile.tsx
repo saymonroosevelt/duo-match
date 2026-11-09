@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Loader2,
   MapPin,
@@ -9,14 +9,21 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { captureAndSaveLocation } from '../lib/geo';
-import { RELATIONSHIP_INTENTIONS } from '../lib/constants';
-import { asArray, cleanText, clampInt, friendlyError } from '../lib/helpers';
+import {
+  RELATIONSHIP_INTENTIONS,
+  GENDER_OPTIONS,
+  VIEW_PREFERENCE_OPTIONS,
+} from '../lib/constants';
+import { asArray, cleanText, clampInt, friendlyError, isMissingGenderColumn } from '../lib/helpers';
+import { isAdminUser } from '../lib/permissions';
 import { deleteProfilePhoto, uploadProfilePhoto } from '../lib/storage';
 import Avatar from '../components/Avatar';
 import BackButton from '../components/BackButton';
 import Toast from '../components/Toast';
 
 const MAX_PHOTOS = 5;
+const MIN_PHOTOS = 3;
+const BIO_MIN_CHARS = 150;
 
 // Texto livre (vírgula, ponto e vírgula ou quebra de linha) → lista salva no perfil.
 function parseTextList(text: any) {
@@ -64,6 +71,8 @@ export default function EditProfile({
     interestsText: joinForEdit(asArray(profile?.intentions)),
     valuesText: joinForEdit(asArray(profile?.values_inegotiable)),
     photos: initialPhotos(profile),
+    gender: profile?.gender || '',
+    viewPreference: profile?.preferred_gender || '',
   });
   const [uploading, setUploading] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -72,6 +81,26 @@ export default function EditProfile({
   const [error, setError] = useState('');
   const [toast, setToast] = useState<any>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
+
+  // Curadoria (os dois e-mails da administração) é isenta do mínimo de 150 caracteres.
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    let active = true;
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }) => {
+        if (active) setIsAdmin(isAdminUser({ user }));
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const bioClean = cleanText(form.bio, 700);
+  const bioLength = bioClean.length;
+  const bioTooShort = !isAdmin && bioLength < BIO_MIN_CHARS;
+  const photosMissing = Math.max(0, MIN_PHOTOS - form.photos.length);
 
   const intentionOptions = useMemo(() => {
     const options = [...RELATIONSHIP_INTENTIONS];
@@ -157,7 +186,7 @@ export default function EditProfile({
     setLocationMessage(
       result.ok
         ? 'Sua localização foi salva. Ela será usada só para mostrar a distância aos membros aprovados.'
-        : result.message || 'N�o foi poss�vel salvar a localiza��o.',
+        : result.message || 'N�o foi poss�vel salvar a localiza��o.',
     );
   }
 
@@ -168,7 +197,7 @@ export default function EditProfile({
     const age = clampInt(form.age, 18, 99, NaN);
     const fullName = cleanText(form.full_name, 80);
     const city = cleanText(form.city, 80);
-    const bio = cleanText(form.bio, 500);
+    const bio = cleanText(form.bio, 700);
     if (!fullName) {
       setError('Informe seu nome.');
       return;
@@ -179,6 +208,24 @@ export default function EditProfile({
     }
     if (!city) {
       setError('Informe sua cidade.');
+      return;
+    }
+    if (photosMissing > 0) {
+      setError(
+        `Adicione mais ${photosMissing} foto${
+          photosMissing > 1 ? 's' : ''
+        } — o perfil precisa de no mínimo ${MIN_PHOTOS} fotos (e no máximo ${MAX_PHOTOS}).`,
+      );
+      return;
+    }
+    if (bioTooShort) {
+      setError(
+        `Sua biografia precisa ter pelo menos ${BIO_MIN_CHARS} caracteres (${bioLength} hoje). Conte um pouco mais sobre você — intenções reais começam por perfis reais.`,
+      );
+      return;
+    }
+    if (!form.gender) {
+      setError('Escolha o seu gênero para salvar o perfil.');
       return;
     }
 
@@ -195,14 +242,29 @@ export default function EditProfile({
       values_inegotiable: parsedValues,
       photos: form.photos,
       photo_url: form.photos[0] || null,
+      gender: form.gender || null,
+      preferred_gender: form.viewPreference || null,
     };
 
-    const { data, error: saveError } = await supabase
+    // Tolerante a banco ainda sem a coluna `gender` (SQL de migração pendente)
+    let { data, error: saveError } = await supabase
       .from('profiles')
       .update(payload)
       .eq('id', profile.id)
       .select()
       .single();
+
+    let genderMissing = false;
+    if (saveError && isMissingGenderColumn(saveError)) {
+      const { gender: _gender, ...withoutGender } = payload;
+      ({ data, error: saveError } = await supabase
+        .from('profiles')
+        .update(withoutGender)
+        .eq('id', profile.id)
+        .select()
+        .single());
+      if (!saveError) genderMissing = true;
+    }
 
     setSaving(false);
 
@@ -211,7 +273,15 @@ export default function EditProfile({
       return;
     }
 
-    setToast({ type: 'success', message: 'Perfil atualizado.' });
+    if (genderMissing) {
+      setToast({
+        type: 'error',
+        message:
+          'Seu perfil foi salvo, mas o gênero ainda não pode ser gravado (falta a coluna no banco). Rode o SQL de migração 20261114_profiles_gender.sql.',
+      });
+    } else {
+      setToast({ type: 'success', message: 'Perfil atualizado.' });
+    }
     onSaved(data);
   }
 
@@ -232,7 +302,7 @@ export default function EditProfile({
             <span className="text-xs text-rose-100/55 ml-1">
               Suas fotos{' '}
               <span className="text-rose-100/30">
-                · {form.photos.length}/{MAX_PHOTOS}
+                · {form.photos.length}/{MAX_PHOTOS} (mín. {MIN_PHOTOS})
               </span>
             </span>
             <span className="text-[9px] uppercase tracking-[0.18em] text-rose-100/30">
@@ -314,9 +384,16 @@ export default function EditProfile({
             onChange={handlePhotos}
           />
           <p className="mt-2.5 text-center text-[10px] leading-relaxed text-rose-100/30">
-            Adicione até 5 fotos. A primeira é a foto principal exibida no app ·
-            até 5 MB por foto. Toque na estrela para escolher qual é a principal.
+            O perfil precisa de{' '}
+            <strong className="text-rose-100/60">3 a 5 fotos</strong> — a primeira é a
+            foto principal exibida no app · até 5 MB por foto. Toque na estrela para
+            escolher qual é a principal.
           </p>
+          {photosMissing > 0 && (
+            <p className="mt-2 text-center text-[10px] leading-relaxed text-amber-300/70">
+              Faltam {photosMissing} foto{photosMissing > 1 ? 's' : ''} para o mínimo de {MIN_PHOTOS}.
+            </p>
+          )}
         </div>
 
         {/* Avatar de pré-visualização da foto principal */}
@@ -327,9 +404,9 @@ export default function EditProfile({
               É assim que os membros aprovados verão a sua foto principal.
             </p>
             <p className="text-[9px] uppercase tracking-widest text-rose-100/30 mt-1">
-              {form.photos.length > 0
-                ? `${form.photos.length} foto${form.photos.length > 1 ? 's' : ''} na galeria`
-                : 'Nenhuma foto ainda'}
+              {photosMissing > 0
+                ? `Faltam ${photosMissing} foto${photosMissing > 1 ? 's' : ''} para salvar`
+                : `${form.photos.length} foto${form.photos.length > 1 ? 's' : ''} na galeria`}
             </p>
           </div>
         </div>
@@ -392,7 +469,14 @@ export default function EditProfile({
           </div>
 
           <label className="block">
-            <span className="text-xs text-rose-100/55 ml-1">Sobre você</span>
+            <span className="text-xs text-rose-100/55 ml-1">
+              Sobre você
+              {isAdmin && (
+                <span className="ml-2 text-[8px] uppercase tracking-[0.18em] text-amber-300/60 align-middle">
+                  Curadoria · sem mínimo
+                </span>
+              )}
+            </span>
             <textarea
               value={form.bio}
               onChange={(event) => update('bio', event.target.value)}
@@ -401,9 +485,26 @@ export default function EditProfile({
               className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm text-white placeholder:text-rose-100/25 focus:outline-none focus:border-rose-500/40 resize-none"
               placeholder="Conte um pouco sobre você, sua rotina e o que valoriza."
             />
-            <span className="block text-right text-[9px] text-rose-100/25 mt-1">
-              {form.bio.length}/700
-            </span>
+            <div className="mt-1.5 flex items-center justify-between gap-3">
+              <span
+                className={
+                  bioTooShort
+                    ? 'text-[9px] leading-relaxed text-amber-300/70'
+                    : 'text-[9px] leading-relaxed text-emerald-300/60'
+                }
+              >
+                {isAdmin
+                  ? 'Você é da curadoria — escreva o que quiser, sem mínimo.'
+                  : bioLength === 0
+                    ? `Mínimo de ${BIO_MIN_CHARS} caracteres para salvar`
+                    : bioTooShort
+                      ? `Faltam ${BIO_MIN_CHARS - bioLength} caracteres (mínimo ${BIO_MIN_CHARS})`
+                      : 'Mínimo de 150 caracteres atingido'}
+              </span>
+              <span className="shrink-0 text-[9px] text-rose-100/25">
+                {bioLength}/700
+              </span>
+            </div>
           </label>
 
           <label className="block">
@@ -421,6 +522,65 @@ export default function EditProfile({
               ))}
             </select>
           </label>
+
+          {/* Seu gênero — obrigatório */}
+          <div>
+            <span className="text-xs text-rose-100/55 ml-1">
+              Seu gênero <span className="text-rose-300/70">*</span>
+            </span>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {GENDER_OPTIONS.map((option) => {
+                const selected = form.gender === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => update('gender', option.value)}
+                    className={`p-4 rounded-2xl border transition-all text-sm ${
+                      selected
+                        ? 'border-rose-400 bg-rose-500/10 text-white'
+                        : 'border-white/10 bg-white/[0.03] text-rose-100/60 hover:border-white/20'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+            {!form.gender && (
+              <p className="mt-1.5 ml-1 text-[10px] text-amber-300/70">
+                Escolha o seu gênero para salvar o perfil.
+              </p>
+            )}
+          </div>
+
+          {/* O que você deseja ver? — filtro da tela Explorar */}
+          <div>
+            <span className="text-xs text-rose-100/55 ml-1">O que você deseja ver?</span>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              {VIEW_PREFERENCE_OPTIONS.map((option) => {
+                const selected = form.viewPreference === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => update('viewPreference', option.value)}
+                    className={`p-3.5 rounded-2xl border transition-all text-xs text-center ${
+                      selected
+                        ? 'border-rose-400 bg-rose-500/15 text-white'
+                        : 'border-white/10 bg-white/[0.03] text-rose-100/60 hover:border-white/20'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-1.5 ml-1 text-[10px] text-rose-100/35 leading-relaxed">
+              Usada na tela Explorar para mostrar apenas quem você escolheu ver.
+              (Quem escolher Ambos, ou não escolher, vê todos os perfis.)
+            </p>
+          </div>
 
           {/* Interesses — texto livre */}
           <div>
@@ -487,6 +647,7 @@ export default function EditProfile({
             {error}
           </p>
         )}
+
       </form>
 
       <div className="fixed bottom-0 left-0 right-0 border-t border-white/[0.07] bg-[#150408] px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
@@ -494,7 +655,13 @@ export default function EditProfile({
           <button
             type="button"
             onClick={handleSave}
-            disabled={saving || uploading > 0}
+            disabled={
+              saving ||
+              uploading > 0 ||
+              bioTooShort ||
+              photosMissing > 0 ||
+              !form.gender
+            }
             className="w-full rounded-full bg-[#f4ece8] py-4 text-sm font-semibold text-[#3a1c1c] hover:bg-white disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2"
           >
             {saving ? (

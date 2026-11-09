@@ -1,6 +1,17 @@
 // Opções usadas em várias telas do Duo Match.
 // Mantenha os textos alinhados com o briefing e com o onboarding.
 
+export const GENDER_OPTIONS = [
+  { value: 'male', label: 'Masculino' },
+  { value: 'female', label: 'Feminino' },
+];
+
+export const VIEW_PREFERENCE_OPTIONS = [
+  { value: 'male', label: 'Masculino' },
+  { value: 'female', label: 'Feminino' },
+  { value: 'all', label: 'Ambos / os dois' },
+];
+
 export const RELATIONSHIP_INTENTIONS = [
   'Relacionamento sério e casamento',
   'Parceiro(a) para crescer na vida',

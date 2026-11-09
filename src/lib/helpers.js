@@ -166,6 +166,20 @@ export function profilePhotos(profile) {
   return single ? [single] : [];
 }
 
+// Detecta o erro do PostgREST/Postgres quando a coluna `gender` ainda não
+// existe (migração 20261114_profiles_gender.sql ainda não executada).
+export function isMissingGenderColumn(error) {
+  if (!error) return false;
+  const message = error?.message || String(error);
+  const code = error?.code || '';
+  return (
+    code === 'PGRST204' ||
+    code === '42703' ||
+    /could not find the 'gender' column/i.test(message) ||
+    /column .*gender.* does not exist/i.test(message)
+  );
+}
+
 export function isPlanSelect(plan) {
   const slug = String(plan?.slug || '').toLowerCase();
   const name = String(plan?.name || '').toLowerCase();
