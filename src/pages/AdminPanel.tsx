@@ -3,6 +3,7 @@ import {
   Check,
   CheckCircle2,
   Clock,
+  CreditCard,
   RefreshCw,
   Search,
   ShieldAlert,
@@ -12,7 +13,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { asArray, formatDate, friendlyError } from '../lib/helpers';
+import { asArray, formatDate, formatPrice, friendlyError } from '../lib/helpers';
 import Avatar from '../components/Avatar';
 import BackButton from '../components/BackButton';
 import EmptyState from '../components/EmptyState';
@@ -34,7 +35,12 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
   const [toast, setToast] = useState<any>(null);
   const [actioningId, setActioningId] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<any>(null);
-  const [view, setView] = useState<'profiles' | 'reports'>('profiles');
+  const [view, setView] = useState<'profiles' | 'subscriptions' | 'reports'>('profiles');
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [subscriptionsLoading, setSubscriptionsLoading] = useState(false);
+  const [subscriptionsError, setSubscriptionsError] = useState('');
+  const [subscriptionsLoaded, setSubscriptionsLoaded] = useState(false);
+  const [subActioningId, setSubActioningId] = useState<string | null>(null);
   const [reports, setReports] = useState<any[]>([]);
   const [reportsLoaded, setReportsLoaded] = useState(false);
   const [reportsLoading, setReportsLoading] = useState(false);
@@ -217,7 +223,101 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
     });
   }
 
-  const refreshing = view === 'profiles' ? loading : reportsLoading;
+  async function loadSubscriptions() {
+    setSubscriptionsLoading(true);
+    setSubscriptionsError('');
+
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      setSubscriptionsError(friendlyError(error));
+      setSubscriptions([]);
+      setSubscriptionsLoaded(true);
+      setSubscriptionsLoading(false);
+      return;
+    }
+
+    const rows = data || [];
+    const userIds = [...new Set(rows.map((row) => row.user_id))];
+    const planIds = [...new Set(rows.map((row) => row.plan_id).filter(Boolean))];
+
+    let profileRows = [];
+    if (userIds.length > 0) {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id,full_name,photo_url,city')
+        .in('id', userIds);
+      profileRows = profileData || [];
+    }
+
+    let planRows = [];
+    if (planIds.length > 0) {
+      const { data: planData } = await supabase
+        .from('plans')
+        .select('id,name,price')
+        .in('id', planIds);
+      planRows = planData || [];
+    }
+
+    const profileMap = new Map(profileRows.map((profile) => [profile.id, profile]));
+    const planMap = new Map(planRows.map((plan) => [plan.id, plan]));
+
+    setSubscriptions(
+      rows.map((row) => ({
+        ...row,
+        profile: profileMap.get(row.user_id) || null,
+        plan: planMap.get(row.plan_id) || null,
+      })),
+    );
+    setSubscriptionsLoaded(true);
+    setSubscriptionsLoading(false);
+  }
+
+  async function activateSubscription(subscription) {
+    if (subActioningId) return;
+    setSubActioningId(subscription.id);
+    const { error } = await supabase
+      .from('subscriptions')
+      .update({ status: 'active' })
+      .eq('id', subscription.id);
+    if (error) {
+      setToast({ type: 'error', message: friendlyError(error) });
+    } else {
+      setToast({ type: 'success', message: 'Assinatura ativada. O membro já pode usar todas as vantagens.' });
+      setSubscriptions((prev) =>
+        prev.map((item) =>
+          item.id === subscription.id ? { ...item, status: 'active' } : item,
+        ),
+      );
+    }
+    setSubActioningId(null);
+  }
+
+  async function cancelSubscription(subscription) {
+    if (subActioningId) return;
+    setSubActioningId(subscription.id);
+    const { error } = await supabase
+      .from('subscriptions')
+      .update({ status: 'cancelled' })
+      .eq('id', subscription.id);
+    if (error) {
+      setToast({ type: 'error', message: friendlyError(error) });
+    } else {
+      setToast({ type: 'success', message: 'Assinatura recusada/cancelada registrada.' });
+      setSubscriptions((prev) =>
+        prev.map((item) =>
+          item.id === subscription.id ? { ...item, status: 'cancelled' } : item,
+        ),
+      );
+    }
+    setSubActioningId(null);
+  }
+
+  const refreshing =
+    view === 'profiles' ? loading : view === 'subscriptions' ? subscriptionsLoading : reportsLoading;
 
   return (
     <div className="min-h-[100dvh] text-white">
@@ -235,7 +335,7 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
           </div>
           <button
             type="button"
-            onClick={view === 'profiles' ? loadProfiles : loadReports}
+            onClick={view === 'profiles' ? loadProfiles : view === 'subscriptions' ? loadSubscriptions : loadReports}
             className="w-10 h-10 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-rose-100/70 hover:bg-white/10"
             aria-label="Atualizar"
           >
@@ -245,11 +345,11 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
       </header>
 
       <div className="max-w-2xl mx-auto px-5 pt-6 pb-16">
-        <div className="grid grid-cols-2 gap-2 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 mb-6">
+        <div className="grid grid-cols-3 gap-2 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 mb-6">
           <button
             type="button"
             onClick={() => setView('profiles')}
-            className={`rounded-full py-2.5 text-xs font-medium transition-colors ${
+            className={`rounded-full py-2.5 text-[11px] font-medium transition-colors ${
               view === 'profiles'
                 ? 'bg-[#f4ece8] text-[#3a1c1c]'
                 : 'text-rose-100/50 hover:text-rose-100'
@@ -260,10 +360,29 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
           <button
             type="button"
             onClick={() => {
+              setView('subscriptions');
+              if (!subscriptionsLoaded) loadSubscriptions();
+            }}
+            className={`rounded-full py-2.5 text-[11px] font-medium transition-colors inline-flex items-center justify-center gap-1.5 ${
+              view === 'subscriptions'
+                ? 'bg-[#f4ece8] text-[#3a1c1c]'
+                : 'text-rose-100/50 hover:text-rose-100'
+            }`}
+          >
+            Assinaturas
+            {subscriptions.some((sub) => sub.status === 'pending_payment') && (
+              <span className="rounded-full bg-amber-700 px-1.5 py-0.5 text-[9px] font-semibold text-white">
+                {subscriptions.filter((sub) => sub.status === 'pending_payment').length}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
               setView('reports');
               if (!reportsLoaded) loadReports();
             }}
-            className={`rounded-full py-2.5 text-xs font-medium transition-colors inline-flex items-center justify-center gap-2 ${
+            className={`rounded-full py-2.5 text-[11px] font-medium transition-colors inline-flex items-center justify-center gap-1.5 ${
               view === 'reports'
                 ? 'bg-[#f4ece8] text-[#3a1c1c]'
                 : 'text-rose-100/50 hover:text-rose-100'
@@ -278,7 +397,101 @@ export default function AdminPanel({ onBack }: { onBack?: () => void }) {
           </button>
         </div>
 
-        {view === 'profiles' ? (
+        {view === 'subscriptions' ? (
+          <>
+            <div className="mb-6">
+              <h2 className="text-2xl font-serif text-rose-50">Assinaturas</h2>
+              <p className="text-xs text-rose-100/40 mt-1">
+                Quem pagou e está com a assinatura em espera. Confirme o pagamento e libere com um toque.
+              </p>
+            </div>
+
+            {subscriptionsLoading ? (
+              <div className="space-y-3">
+                {[0, 1, 2].map((item) => (
+                  <div key={item} className="h-24 rounded-3xl border border-white/5 bg-white/[0.035] animate-pulse" />
+                ))}
+              </div>
+            ) : subscriptionsError ? (
+              <div className="rounded-3xl border border-red-500/20 bg-red-950/20 p-6 text-center">
+                <p className="text-red-200/90 text-sm leading-relaxed">{subscriptionsError}</p>
+                <button
+                  type="button"
+                  onClick={loadSubscriptions}
+                  className="mt-5 inline-flex items-center gap-2 text-rose-200 text-xs border border-white/15 rounded-full px-5 py-2.5 hover:bg-white/5"
+                >
+                  <RefreshCw size={13} /> Tentar novamente
+                </button>
+              </div>
+            ) : subscriptions.length === 0 ? (
+              <EmptyState
+                icon={CreditCard}
+                title="Nenhuma assinatura por enquanto"
+                description="Quando um membro escolher o plano e estiver aguardando a confirmação do pagamento, ele aparece aqui."
+                actionLabel="Atualizar"
+                onAction={loadSubscriptions}
+              />
+            ) : (
+              <div className="space-y-3">
+                {subscriptions.map((subscription) => {
+                  const pending = subscription.status === 'pending_payment';
+                  return (
+                    <article
+                      key={subscription.id}
+                      className="flex items-center gap-3 rounded-3xl border border-white/[0.08] bg-white/[0.035] p-4"
+                    >
+                      <Avatar
+                        src={subscription.profile?.photo_url}
+                        name={subscription.profile?.full_name || 'Membro'}
+                        size="md"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-rose-50 truncate">
+                          {subscription.profile?.full_name || 'Membro sem nome'}
+                        </p>
+                        <p className="text-[11px] text-rose-100/45 leading-snug mt-0.5">
+                          {subscription.plan?.name || 'Duo Match'} · {formatPrice(subscription.plan?.price || 49.9)} ·{' '}
+                          {formatDate(subscription.created_at, { day: '2-digit', month: 'short' })}
+                        </p>
+                        <span
+                          className={`inline-flex items-center gap-1 mt-2 rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-widest ${
+                            pending
+                              ? 'bg-amber-950/40 border border-amber-800/30 text-amber-200/80'
+                              : subscription.status === 'active'
+                                ? 'bg-emerald-950/40 border border-emerald-800/30 text-emerald-200/80'
+                                : 'bg-white/5 border border-white/10 text-rose-100/40'
+                          }`}
+                        >
+                          {pending ? 'Aguardando pagamento' : subscription.status}
+                        </span>
+                      </div>
+                      {pending && (
+                        <div className="flex flex-col gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => activateSubscription(subscription)}
+                            disabled={subActioningId === subscription.id}
+                            className="rounded-full bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 text-[11px] font-semibold disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-1.5"
+                          >
+                            <CheckCircle2 size={13} /> {subActioningId === subscription.id ? 'Ativando...' : 'Ativar'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => cancelSubscription(subscription)}
+                            disabled={subActioningId === subscription.id}
+                            className="rounded-full border border-white/10 text-rose-100/50 hover:bg-white/5 px-4 py-2 text-[11px] disabled:opacity-50"
+                          >
+                            Recusar
+                          </button>
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        ) : view === 'profiles' ? (
           <>
             <div className="mb-6">
               <h2 className="text-2xl font-serif text-rose-50">Fila de aprovação</h2>
