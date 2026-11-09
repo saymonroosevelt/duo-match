@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, Eye, EyeOff, Heart, Loader2, Lock, Mail } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
+const AUTH_TIMEOUT_MS = 15000;
+
 function translateAuthError(message) {
   if (/invalid login credentials/i.test(message)) {
     return 'E-mail ou senha incorretos.';
@@ -21,7 +23,15 @@ function translateAuthError(message) {
   if (/rate limit/i.test(message)) {
     return 'Muitas tentativas. Aguarde alguns instantes e tente novamente.';
   }
-  return message;
+  if (/failed to fetch|networkerror|load failed|network request failed/i.test(message)) {
+    return 'Falha de rede. Verifique sua conexão com a internet e tente novamente.';
+  }
+  return message || 'Erro inesperado. Tente novamente.';
+}
+
+function friendlyError(rawMessage) {
+  if (!rawMessage) return 'Erro inesperado. Tente novamente.';
+  return translateAuthError(rawMessage);
 }
 
 export default function AuthScreen({ onBack, initialMode = 'login' }) {
@@ -61,46 +71,63 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
 
     setLoading(true);
 
-    const signCall = isLogin
-      ? supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        })
-      : supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            data: {
-              lgpd_accepted_at: new Date().toISOString(),
-            },
-          },
-        });
-
+    // Observação: métodos do supabase.auth não aceitam AbortSignal, então o
+    // teto de 15s é feito com Promise.race (o fetch pendente expira sozinho).
     const timeoutFallback = {
       data: { user: null, session: null },
       error: {
         message:
-          'Não conseguimos falar com o servidor. Verifique sua conexão com a internet e tente novamente.',
+          'Não conseguimos falar com o servidor em 15 segundos. Verifique sua conexão (ou tente pela rede celular) e toque em Entrar novamente.',
       },
     };
-    const result = await Promise.race([
-      signCall,
-      new Promise((resolve) => setTimeout(() => resolve(timeoutFallback), 15000)),
-    ]);
+    const race = (promise) =>
+      Promise.race([
+        promise,
+        new Promise((resolve) => setTimeout(() => resolve(timeoutFallback), AUTH_TIMEOUT_MS)),
+      ]);
+
+    let result;
+    try {
+      result = await race(
+        (isLogin
+          ? supabase.auth.signInWithPassword({
+              email: email.trim(),
+              password,
+            })
+          : supabase.auth.signUp({
+              email: email.trim(),
+              password,
+              options: {
+                data: {
+                  lgpd_accepted_at: new Date().toISOString(),
+                },
+              },
+            })).catch((networkError) => ({
+          // O Safari/iOS lança TypeError quando a rede bloqueia/derruba o request
+          data: { user: null, session: null },
+          error: { message: networkError?.message || 'Failed to fetch' },
+        })),
+      );
+    } catch (fatal) {
+      result = {
+        data: { user: null, session: null },
+        error: { message: fatal?.message || 'Failed to fetch' },
+      };
+    }
 
     setLoading(false);
 
     if (result.error) {
-      setMessage(translateAuthError(result.error.message));
+      setMessage(friendlyError(result.error.message));
       setMessageType('error');
       return;
     }
 
     if (!isLogin) {
-      if (result.data.session) {
+      if (result?.data?.session) {
         setMessage('Conta criada! Vamos completar seu perfil.');
         setMessageType('success');
-        // iOS/PWA: boot limpo evita estado preso no navegador (telas de carga infinita)
+        // iOS/PWA: boot limpo evita estado preso no navegador (carga infinita)
         setTimeout(() => window.location.reload(), 800);
       } else {
         setMessage(
@@ -111,7 +138,10 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
     } else {
       setMessage('Login realizado. Bem-vindo de volta.');
       setMessageType('success');
-      setTimeout(() => window.location.reload(), 600);
+      // Fallback final: redireciona com replace (não depende apenas do evento de sessão)
+      setTimeout(() => {
+        window.location.replace(window.location.pathname);
+      }, 600);
     }
   }
 
@@ -278,20 +308,22 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
                 type="button"
                 onClick={() => handleAuth(true)}
                 disabled={loading}
-                className="w-full rounded-full border border-white/20 bg-transparent py-4 text-sm font-medium text-[#f4ece8] hover:bg-white/5 transition-colors disabled:opacity-50"
+                aria-busy={loading}
+                className="w-full rounded-full border border-white/20 bg-transparent py-4 text-sm font-medium text-[#f4ece8] hover:bg-white/5 transition-colors disabled:opacity-60 inline-flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                Entrar na sua conta
+                {loading ? 'Entrando…' : 'Entrar na sua conta'}
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => handleAuth(false)}
                 disabled={loading}
-                className="w-full rounded-full bg-[#f4ece8] py-4 text-sm font-semibold text-[#3a1c1c] hover:bg-white transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                aria-busy={loading}
+                className="w-full rounded-full bg-[#f4ece8] py-4 text-sm font-semibold text-[#3a1c1c] hover:bg-white transition-colors disabled:opacity-60 inline-flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                Criar sua conta
+                {loading ? 'Criando conta…' : 'Criar sua conta'}
               </button>
             )}
           </div>
