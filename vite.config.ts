@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => {
             authToken: env.SENTRY_AUTH_TOKEN,
             org: env.SENTRY_ORG,
             project: env.SENTRY_PROJECT,
+            // Deve ser o mesmo release que o runtime reporta via VITE_SENTRY_RELEASE —
+            // senão os source maps ficam numa release diferente da dos eventos.
+            release: env.VITE_SENTRY_RELEASE || 'duomatch@2026-11',
             sourcemaps: {
               assets: './dist/**',
               deleteAfterUpload: true,
