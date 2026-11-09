@@ -87,6 +87,22 @@ as $$
   );
 $$;
 
+-- A service_role é reconhecida tanto pelo GUC legado quanto pelo
+-- request.jwt.claims (PostgREST novo). Sem isso, os triggers abaixo
+-- silenciosamente revertem o status da assinatura no webhook.
+create or replace function public.is_service_role()
+returns boolean
+language sql
+stable
+as $$
+  select coalesce(
+    nullif(current_setting('request.jwt.claim.role', true), ''),
+    nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role',
+    nullif(current_setting('role', true), ''),
+    ''
+  ) = 'service_role';
+$$;
+
 create or replace function public.touch_updated_at()
 returns trigger
 language plpgsql
@@ -110,8 +126,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if coalesce(current_setting('request.jwt.claim.role', true), '') = 'service_role'
-     or public.is_admin() then
+  if public.is_service_role() or public.is_admin() then
     return new;
   end if;
 
@@ -206,8 +221,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if coalesce(current_setting('request.jwt.claim.role', true), '') = 'service_role'
-     or public.is_admin() then
+  if public.is_service_role() or public.is_admin() then
     return new;
   end if;
 
@@ -266,8 +280,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if coalesce(current_setting('request.jwt.claim.role', true), '') = 'service_role'
-     or public.is_admin() then
+  if public.is_service_role() or public.is_admin() then
     return new;
   end if;
 

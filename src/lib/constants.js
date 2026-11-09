@@ -84,6 +84,7 @@ export const COMMUNITIES = [
     filter: 'Empreendedorismo',
     desc: 'Negócios e crescimento',
     image: '/empreendedorismo.jpg?v=2',
+    position: 'center 80%',
   },
 ];
 
