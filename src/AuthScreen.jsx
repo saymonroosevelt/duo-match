@@ -61,12 +61,12 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
 
     setLoading(true);
 
-    const result = isLogin
-      ? await supabase.auth.signInWithPassword({
+    const signCall = isLogin
+      ? supabase.auth.signInWithPassword({
           email: email.trim(),
           password,
         })
-      : await supabase.auth.signUp({
+      : supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
@@ -75,6 +75,18 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
             },
           },
         });
+
+    const timeoutFallback = {
+      data: { user: null, session: null },
+      error: {
+        message:
+          'Não conseguimos falar com o servidor. Verifique sua conexão com a internet e tente novamente.',
+      },
+    };
+    const result = await Promise.race([
+      signCall,
+      new Promise((resolve) => setTimeout(() => resolve(timeoutFallback), 15000)),
+    ]);
 
     setLoading(false);
 

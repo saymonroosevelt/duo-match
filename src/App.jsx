@@ -47,6 +47,14 @@ function fetchProfileOnce(userId) {
   return profileRequests.get(userId);
 }
 
+// Corrida contra o tempo: nenhuma espera de rede pode travar o app para sempre.
+function withTimeout(promise, ms, fallback) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
 function App() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -57,6 +65,7 @@ function App() {
   const [exploreInterest, setExploreInterest] = useState('');
   const [currentScreen, setCurrentScreen] = useState('welcome');
   const [authMode, setAuthMode] = useState('login');
+  const [profileStuck, setProfileStuck] = useState(false);
 
   const params = new URLSearchParams(window.location.search);
   const isAdminRoute = params.get('admin') === 'true';
@@ -93,11 +102,21 @@ function App() {
 
       lastSessionId = nextSession.user.id;
       // Splash visível enquanto o perfil é buscado — nunca mais tela preta.
+      // Teto de 8s: se a rede do aparelho travar, o app não fica preso para sempre.
       setLoading(true);
-      const nextProfile = await fetchProfile(nextSession.user.id);
+      // undefined = timeout de rede; null = perfil realmente não existe (onboarding)
+      const nextProfile = await withTimeout(fetchProfile(nextSession.user.id), 8000, undefined);
 
       if (!active) return;
 
+      if (nextProfile === undefined) {
+        setProfile(null);
+        setProfileStuck(true);
+        setLoading(false);
+        return;
+      }
+
+      setProfileStuck(false);
       setProfile(nextProfile);
       setLoading(false);
     }
@@ -133,6 +152,21 @@ function App() {
     setProfile(nextProfile);
   }, [session, fetchProfile]);
 
+  async function retryLoad() {
+    const userId = session?.user?.id;
+    if (!userId || loading) return;
+    setProfileStuck(false);
+    setLoading(true);
+    const nextProfile = await withTimeout(fetchProfile(userId), 8000, undefined);
+    if (nextProfile === undefined) {
+      setProfileStuck(true);
+      setLoading(false);
+      return;
+    }
+    setProfile(nextProfile);
+    setLoading(false);
+  }
+
   if (isLegalRoute) {
     return (
       <PrivacyScreen
@@ -163,6 +197,40 @@ function App() {
         <span className="text-[11px] uppercase tracking-[0.3em] text-[#e8cbc4]/60">
           Carregando
         </span>
+      </div>
+    );
+  }
+
+  if (session && profileStuck) {
+    return (
+      <div className="min-h-screen text-[#f8e3d8] flex flex-col items-center justify-center gap-6 px-8 text-center">
+        <Heart
+          size={56}
+          strokeWidth={1.6}
+          className="text-rose-200/90"
+          fill="rgba(244,236,232,0.12)"
+        />
+        <h1 className="font-serif text-2xl text-rose-50">
+          Não foi possível carregar seus dados
+        </h1>
+        <p className="text-sm text-rose-100/60 max-w-xs leading-relaxed">
+          A conexão com o servidor demorou demais. Verifique sua internet (ou
+          tente pela rede celular) e toque em tentar novamente.
+        </p>
+        <button
+          type="button"
+          onClick={retryLoad}
+          className="rounded-full bg-[#f4ece8] px-8 py-3.5 text-sm font-semibold text-[#3a1c1c] hover:bg-white transition-colors"
+        >
+          Tentar novamente
+        </button>
+        <button
+          type="button"
+          onClick={() => supabase.auth.signOut()}
+          className="text-xs text-rose-200/55 underline underline-offset-4 hover:text-rose-100"
+        >
+          Sair da conta
+        </button>
       </div>
     );
   }
