@@ -87,7 +87,7 @@ export default function PlansScreen({ user, onBack }) {
       if (current && current.status === 'pending_payment') {
         const { error: updateError } = await supabase
           .from('subscriptions')
-          .update({ plan_id: plan.id })
+          .update({ plan_id: plan.id, checkout_email: user.email?.toLowerCase() })
           .eq('id', current.id);
         if (updateError) throw updateError;
       } else if (!current) {
@@ -97,6 +97,7 @@ export default function PlansScreen({ user, onBack }) {
             user_id: user.id,
             plan_id: plan.id,
             status: 'pending_payment',
+            checkout_email: user.email?.toLowerCase(),
           });
         if (insertError) throw insertError;
       } else if (current && ['cancelled', 'expired'].includes(current.status)) {
@@ -106,6 +107,7 @@ export default function PlansScreen({ user, onBack }) {
             user_id: user.id,
             plan_id: plan.id,
             status: 'pending_payment',
+            checkout_email: user.email?.toLowerCase(),
           });
         if (insertError) throw insertError;
       } else {
