@@ -67,7 +67,7 @@ export default function Messages({
             <h1 className="text-3xl font-serif text-rose-50 tracking-tight">Mensagens</h1>
             <p className="text-rose-100/40 text-xs mt-1">
               {unreadTotal > 0
-                ? `${unreadTotal} ${unreadTotal === 1 ? 'conversa não lida' : 'conversas não lidas'}`
+                ? `${unreadTotal} ${unreadTotal === 1 ? 'mensagem não lida' : 'mensagens não lidas'}`
                 : 'Conversas que começaram com um match.'}
             </p>
           </div>
