@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Compass,
   Heart,
@@ -8,6 +8,7 @@ import {
   Users,
 } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { captureAndSaveLocation } from './lib/geo';
 import WelcomeScreen from './WelcomeScreen';
 import AuthScreen from './AuthScreen';
 import OnboardingScreen from './OnboardingScreen';
@@ -145,6 +146,23 @@ function App() {
     // O perfil é lido apenas na troca de sessão; edições usam refreshProfile.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProfile]);
+
+  // Captura 1x por sessão a geolocalização do usuário logado (só com GPS permitido).
+  // Negar o GPS nunca trava o app — apenas segue sem distância.
+  const locationCapturedRef = useRef(false);
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId || locationCapturedRef.current) return;
+    // Só tenta quando a curadoria aprovou (não pedir GPS para visitante/pendente)
+    if (profile && profile.status !== 'approved') return;
+
+    locationCapturedRef.current = true;
+    captureAndSaveLocation(supabase, userId).then((result) => {
+      if (!result.ok) {
+        console.info('Geolocalização não capturada:', result.message);
+      }
+    });
+  }, [session, profile]);
 
   const refreshProfile = useCallback(async () => {
     if (!session?.user?.id) return;

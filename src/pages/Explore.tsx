@@ -15,6 +15,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { INTEREST_OPTIONS } from '../lib/constants';
 import { asArray, firstName, friendlyError } from '../lib/helpers';
+import { haversineKm, isValidCoord } from '../lib/geo';
 import Avatar from '../components/Avatar';
 import EmptyState from '../components/EmptyState';
 import Toast from '../components/Toast';
@@ -50,6 +51,7 @@ export default function Explore({
   const [matchInfo, setMatchInfo] = useState<any>(null);
   const [toast, setToast] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [myCoords, setMyCoords] = useState<any>(null);
 
   useEffect(() => {
     if (!initialInterest) return;
@@ -77,6 +79,17 @@ export default function Explore({
     }
 
     setUserId(user.id);
+
+    // Coordenadas do usuário logado para o cálculo de distância (Haversine).
+    // Se o GPS foi negado ou ainda não foi capturado, segue sem distância.
+    supabase
+      .from('profiles')
+      .select('latitude,longitude')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (isValidCoord(data)) setMyCoords(data);
+      });
 
     // Bloqueios: se a tabela ainda não existir, o app continua funcionando.
     let blockedIds = new Set<string>();
@@ -156,6 +169,15 @@ export default function Explore({
   }, [loadProfiles, refreshKey]);
 
   const current = profiles[index] || null;
+
+  const locationLabel = (profile: any) => {
+    const km = haversineKm(myCoords, profile);
+    if (km != null) {
+      const distance = km < 1 ? 'A menos de 1 km de você' : `A ${Math.round(km)} km de você`;
+      return profile?.city ? `${profile.city} • ${distance}` : distance;
+    }
+    return profile?.city || 'Localização não informada';
+  };
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -454,7 +476,7 @@ export default function Explore({
 
               <div className="flex items-center gap-1.5 text-white/60 text-xs">
                 <MapPin size={13} />
-                <span>{current.city || 'Localização não informada'}</span>
+                <span>{locationLabel(current)}</span>
               </div>
 
               {current.what_procura && (

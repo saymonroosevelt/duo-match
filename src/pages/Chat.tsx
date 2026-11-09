@@ -142,7 +142,7 @@ export default function Chat({
 
   async function handleSend(event) {
     event.preventDefault();
-    const content = newMessage.trim();
+    const content = newMessage.trim().slice(0, 2000);
     if (!content || sending || !currentUserId || blocked) return;
 
     setSending(true);

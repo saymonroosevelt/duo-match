@@ -13,7 +13,7 @@ import {
   INTEREST_OPTIONS,
   RELATIONSHIP_INTENTIONS,
 } from './lib/constants';
-import { friendlyError } from './lib/helpers';
+import { friendlyError, cleanText, clampInt } from './lib/helpers';
 import { uploadAvatar } from './lib/storage';
 import Avatar from './components/Avatar';
 
@@ -72,12 +72,15 @@ export default function OnboardingScreen({ session }) {
   async function handleSaveProfile() {
     if (loading) return;
 
-    const age = Number(formData.age);
-    if (!formData.full_name.trim() || !formData.city.trim()) {
+    const cleanName = cleanText(formData.full_name, 80);
+    const cleanCity = cleanText(formData.city, 80);
+    const cleanBio = cleanText(formData.bio, 500);
+    const age = clampInt(formData.age, 18, 99, NaN);
+    if (!cleanName || !cleanCity) {
       setError('Preencha nome e cidade para continuar.');
       return;
     }
-    if (!Number.isFinite(age) || age < 18 || age > 99) {
+    if (!Number.isFinite(age)) {
       setError('A idade precisa estar entre 18 e 99 anos.');
       return;
     }
@@ -95,10 +98,10 @@ export default function OnboardingScreen({ session }) {
 
     const { error: saveError } = await supabase.from('profiles').upsert({
       id: session.user.id,
-      full_name: formData.full_name.trim(),
+      full_name: cleanName,
       age,
-      city: formData.city.trim(),
-      bio: formData.bio.trim(),
+      city: cleanCity,
+      bio: cleanBio,
       what_procura: formData.relationship_intention,
       intentions: formData.interests,
       photo_url: formData.photo_url || null,

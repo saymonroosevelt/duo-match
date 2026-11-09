@@ -1,8 +1,68 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Eye, EyeOff, Heart, Loader2, Lock, Mail } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { isValidEmail } from './lib/helpers';
 
 const AUTH_TIMEOUT_MS = 15000;
+
+// --- Backstop no navegador (não substitui o servidor, mas evita spam óbvio) ---
+const LOCAL_ATTEMPTS_KEY = 'dm_login_attempts';
+const LOCAL_WINDOW_MS = 15 * 60 * 1000;
+const LOCAL_MAX_FAILS = 8;
+
+function readLocalAttempts() {
+  try {
+    const rec = JSON.parse(window.localStorage.getItem(LOCAL_ATTEMPTS_KEY) || 'null');
+    if (!rec || typeof rec.count !== 'number') return { count: 0, resetAt: 0 };
+    if (Date.now() > rec.resetAt) return { count: 0, resetAt: 0 };
+    return rec;
+  } catch {
+    return { count: 0, resetAt: 0 };
+  }
+}
+
+function writeLocalAttempts(count) {
+  try {
+    window.localStorage.setItem(
+      LOCAL_ATTEMPTS_KEY,
+      JSON.stringify({ count, resetAt: Date.now() + LOCAL_WINDOW_MS }),
+    );
+  } catch {
+    /* sem storage (modo privado): segue apenas com o servidor */
+  }
+}
+
+function clearLocalAttempts() {
+  try {
+    window.localStorage.removeItem(LOCAL_ATTEMPTS_KEY);
+  } catch {
+    /* ok */
+  }
+}
+
+// Tenta a função serverless do Netlify (rate limit por IP real).
+// Retorna null se a função estiver indisponível — aí usamos o Supabase direto.
+async function tryRateLimitedLogin(email, password) {
+  let r;
+  try {
+    r = await fetch('/.netlify/functions/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch {
+    return null; // função inalcançável (offline, Netlify fora etc.)
+  }
+  let data = {};
+  try {
+    data = await r.json();
+  } catch {
+    data = {};
+  }
+  // 404/5xx = função não publicada → cai no caminho direto (Supabase limita por conta própria)
+  if (r.status === 404 || (r.status >= 500 && r.status !== 502 && r.status !== 503)) return null;
+  return { status: r.status, data };
+}
 
 function translateAuthError(message) {
   if (/invalid login credentials/i.test(message)) {
@@ -48,8 +108,8 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
     if (loading) return;
     setMessage('');
 
-    if (!email.trim()) {
-      setMessage('Informe seu e-mail.');
+    if (!isValidEmail(email)) {
+      setMessage('Informe um e-mail válido (ex: nome@dominio.com).');
       setMessageType('error');
       return;
     }
@@ -70,6 +130,56 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
     }
 
     setLoading(true);
+
+    // Caminho preferencial quando for login: função Netlify com rate limit por IP
+    if (isLogin) {
+      // Anteparo local: impede spam óbvio no próprio dispositivo
+      const local = readLocalAttempts();
+      if (local.count >= LOCAL_MAX_FAILS) {
+        setLoading(false);
+        setMessage(
+          `Muitas tentativas de login. Aguarde ${Math.ceil((local.resetAt - Date.now()) / 60000)} minuto(s) e tente novamente.`,
+        );
+        setMessageType('error');
+        return;
+      }
+
+      const rl = await tryRateLimitedLogin(email.trim(), password);
+
+      if (rl) {
+        if (rl.status === 200 && rl.data?.access_token) {
+          clearLocalAttempts();
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: rl.data.access_token,
+            refresh_token: rl.data.refresh_token,
+          });
+          setLoading(false);
+          if (sessionError) {
+            setMessage('Login realizado, mas houve um problema ao iniciar a sessão. Tente entrar novamente.');
+            setMessageType('error');
+            return;
+          }
+          setMessage('Login realizado. Bem-vindo de volta.');
+          setMessageType('success');
+          setTimeout(() => window.location.replace(window.location.pathname), 400);
+          return;
+        }
+        if (rl.status === 429) {
+          setLoading(false);
+          setMessage(rl.data?.message || 'Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+          setMessageType('error');
+          return;
+        }
+        // 400/401 = credenciais inválidas (Supabase foi chamado pela função)
+        const failed = readLocalAttempts();
+        writeLocalAttempts(failed.count + 1);
+        setLoading(false);
+        setMessage('E-mail ou senha incorretos.');
+        setMessageType('error');
+        return;
+      }
+      // rl === null: função indisponível → caminho direto abaixo (com timeout)
+    }
 
     // Observação: métodos do supabase.auth não aceitam AbortSignal, então o
     // teto de 15s é feito com Promise.race (o fetch pendente expira sozinho).
@@ -118,10 +228,15 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
     setLoading(false);
 
     if (result.error) {
+      if (isLogin) {
+        const failed = readLocalAttempts();
+        writeLocalAttempts(failed.count + 1);
+      }
       setMessage(friendlyError(result.error.message));
       setMessageType('error');
       return;
     }
+    if (isLogin) clearLocalAttempts();
 
     if (!isLogin) {
       if (result?.data?.session) {

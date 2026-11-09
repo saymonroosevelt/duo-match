@@ -1,12 +1,13 @@
 import { useMemo, useRef, useState } from 'react';
-import { Camera, Loader2, Save, Trash2 } from 'lucide-react';
+import { Camera, Loader2, MapPin, Save, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { captureAndSaveLocation } from '../lib/geo';
 import {
   INTEREST_OPTIONS,
   RELATIONSHIP_INTENTIONS,
   VALUES_OPTIONS,
 } from '../lib/constants';
-import { asArray, friendlyError } from '../lib/helpers';
+import { asArray, cleanText, clampInt, friendlyError } from '../lib/helpers';
 import { uploadAvatar } from '../lib/storage';
 import Avatar from '../components/Avatar';
 import BackButton from '../components/BackButton';
@@ -33,6 +34,8 @@ export default function EditProfile({
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [locationMessage, setLocationMessage] = useState('');
   const [error, setError] = useState('');
   const [toast, setToast] = useState<any>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -78,20 +81,43 @@ export default function EditProfile({
     }
   }
 
+  async function handleUseLocation() {
+    if (locating) return;
+    setLocating(true);
+    setError('');
+    setLocationMessage('');
+    const userId = profile?.id;
+    if (!userId) {
+      setLocating(false);
+      setLocationMessage('Sessão expirada. Entre novamente.');
+      return;
+    }
+    const result = await captureAndSaveLocation(supabase, userId);
+    setLocating(false);
+    setLocationMessage(
+      result.ok
+        ? 'Sua localização foi salva. Ela será usada só para mostrar a distância aos membros aprovados.'
+        : result.message,
+    );
+  }
+
   async function handleSave(event) {
     event?.preventDefault();
     if (saving) return;
 
-    const age = Number(form.age);
-    if (!form.full_name.trim()) {
+    const age = clampInt(form.age, 18, 99, NaN);
+    const fullName = cleanText(form.full_name, 80);
+    const city = cleanText(form.city, 80);
+    const bio = cleanText(form.bio, 500);
+    if (!fullName) {
       setError('Informe seu nome.');
       return;
     }
-    if (!Number.isFinite(age) || age < 18 || age > 99) {
+    if (!Number.isFinite(age)) {
       setError('A idade precisa estar entre 18 e 99 anos.');
       return;
     }
-    if (!form.city.trim()) {
+    if (!city) {
       setError('Informe sua cidade.');
       return;
     }
@@ -100,10 +126,10 @@ export default function EditProfile({
     setError('');
 
     const payload = {
-      full_name: form.full_name.trim(),
+      full_name: fullName,
       age,
-      city: form.city.trim(),
-      bio: form.bio.trim(),
+      city,
+      bio,
       what_procura: form.what_procura,
       intentions: form.interests,
       values_inegotiable: form.values,
@@ -209,6 +235,29 @@ export default function EditProfile({
                 placeholder="Florianópolis, SC"
               />
             </label>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 flex items-center gap-3">
+            <MapPin size={17} className="text-rose-200/60 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] text-rose-100/70 leading-snug">
+                Mostre a distância entre você e outros membros (aproximada, em km).
+              </p>
+              {locationMessage && (
+                <p className="text-[10px] text-rose-100/45 mt-1 leading-snug">
+                  {locationMessage}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={handleUseLocation}
+              disabled={locating}
+              className="shrink-0 rounded-full border border-white/15 bg-white/[0.06] px-3 py-2 text-[10px] uppercase tracking-widest text-rose-100/70 hover:bg-white/[0.09] disabled:opacity-50 inline-flex items-center gap-1.5"
+            >
+              {locating ? <Loader2 size={12} className="animate-spin" /> : null}
+              {locating ? 'Localizando' : 'Ativar GPS'}
+            </button>
           </div>
 
           <label className="block">

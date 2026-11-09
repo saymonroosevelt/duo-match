@@ -1,3 +1,22 @@
+// Remove caracteres de controle, colapsa espaços e limita o tamanho do texto.
+export function cleanText(value, maxLength = 500) {
+  return String(value ?? '')
+    .replace(/[\u0000-\u001F\u007F]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
+}
+
+export function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(value ?? '').trim());
+}
+
+export function clampInt(value, min, max, fallback = NaN) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(n)));
+}
+
 // Pequenos utilitários compartilhados entre as telas.
 
 export function asArray(value) {
