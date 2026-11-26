@@ -258,7 +258,8 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
     setLoading(false);
 
     if (result.error) {
-      if (isLogin) {
+      // Falha de captcha não é senha errada: não conta como tentativa.
+      if (isLogin && !/captcha/i.test(result.error.message || '')) {
         const failed = readLocalAttempts();
         writeLocalAttempts(failed.count + 1);
       }
@@ -379,12 +380,12 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-100/30"
               />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Sua senha"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 autoComplete="current-password"
-                className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-4 pl-11 pr-4 text-sm text-rose-50 placeholder:text-rose-100/25 focus:outline-none focus:border-rose-500/60 transition-colors"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-4 pl-11 pr-12 text-sm text-rose-50 placeholder:text-rose-100/25 focus:outline-none focus:border-rose-500/60 transition-colors"
               />
               <button
                 type="button"
