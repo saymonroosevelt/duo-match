@@ -46,6 +46,7 @@ export const handler = async (event) => {
 
   const email = String(body.email || '').trim().toLowerCase();
   const password = String(body.password || '');
+  const captchaToken = typeof body.captchaToken === 'string' ? body.captchaToken.slice(0, 4096) : '';
   if (!email || !password) {
     return json({ error: 'invalid_credentials', message: 'Informe e-mail e senha.' }, 400);
   }
@@ -101,7 +102,12 @@ export const handler = async (event) => {
         Authorization: `Bearer ${supabaseAnonKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        email,
+        password,
+        // Captcha (Turnstile): o Supabase exige quando a proteção está ligada.
+        ...(captchaToken ? { gotrue_meta_security: { captcha_token: captchaToken } } : {}),
+      }),
     });
   } catch {
     return json(
@@ -111,6 +117,10 @@ export const handler = async (event) => {
   }
 
   const payload = await resp.json().catch(() => ({}));
+
+  if (resp.status >= 400 && /captcha/i.test(`${payload?.error_code || ''} ${payload?.msg || ''} ${payload?.message || ''}`)) {
+    return json({ error: 'captcha_failed', message: 'A verificação anti-robô falhou. Tente de novo.' }, 400);
+  }
 
   if (resp.status >= 400) {
     if (store) {

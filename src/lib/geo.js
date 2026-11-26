@@ -15,7 +15,7 @@ export function isValidCoord(value) {
 // Arredonda para ~110 m de precisão (2 casas ≈ 1,1 km não; 4 casas ≈ 11 m).
 // Aqui usamos 3 casas (≈110 m): suficiente para "a mais ou menos X km".
 export function roundCoord(value) {
-  return Math.round(Number(value) * 1000) / 1000;
+  return Math.round(Number(value) * 100) / 100; // ~1 km: protege o endereço
 }
 
 export function haversineKm(from, to) {
