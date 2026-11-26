@@ -97,6 +97,15 @@ function pickCustomerEmail(payload) {
   );
 }
 
+// Normaliza o e-mail para o filtro ILIKE: recusa caracteres curinga
+// (% e *) e escapa "_" e "\\" para que um e-mail nunca case com o de outra pessoa
+// (ex.: "a_b@x.com" ativando a assinatura de "axb@x.com").
+function safeEmailPattern(raw) {
+  const email = String(raw || '').trim().toLowerCase();
+  if (!/^[^\s@%*]+@[^\s@%*]+\.[^\s@%*]+$/.test(email)) return null;
+  return email.replace(/[\\_]/g, (c) => `\\${c}`);
+}
+
 function pickGatewayId(payload) {
   return (
     payload?.Subscription?.id ||
@@ -189,7 +198,7 @@ export default async function handler(request) {
   }
 
   const eventType = payload?.webhook_event_type || '';
-  const customerEmail = pickCustomerEmail(payload);
+  const customerEmail = safeEmailPattern(pickCustomerEmail(payload));
   const gatewayId = pickGatewayId(payload);
 
   const supabaseUrl = process.env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL;
@@ -271,7 +280,7 @@ export default async function handler(request) {
       }
       const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
       const rows = await applyAndConfirm(
-        `checkout_email=ilike.${encodeURIComponent(customerEmail.trim())}&status=in.(pending_payment,active,past_due)&select=id,user_id,status`,
+        `checkout_email=ilike.${encodeURIComponent(customerEmail)}&status=in.(pending_payment,active,past_due)&select=id,user_id,status`,
         {
           status: 'active',
           gateway: 'kiwify',
@@ -291,7 +300,7 @@ export default async function handler(request) {
         return json({ ok: false, error: 'no_customer_email' }, 202);
       }
       const rows = await applyAndConfirm(
-        `checkout_email=ilike.${encodeURIComponent(customerEmail.trim())}&status=in.(active,pending_payment,past_due)&select=id,user_id,status`,
+        `checkout_email=ilike.${encodeURIComponent(customerEmail)}&status=in.(active,pending_payment,past_due)&select=id,user_id,status`,
         { status: 'cancelled', gateway: 'kiwify' },
         'cancelled',
       );
@@ -304,7 +313,7 @@ export default async function handler(request) {
         return json({ ok: false, error: 'no_customer_email' }, 202);
       }
       const rows = await applyAndConfirm(
-        `checkout_email=ilike.${encodeURIComponent(customerEmail.trim())}&status=eq.active&select=id,user_id,status`,
+        `checkout_email=ilike.${encodeURIComponent(customerEmail)}&status=eq.active&select=id,user_id,status`,
         { status: 'past_due', gateway: 'kiwify' },
         'past_due',
       );
@@ -321,7 +330,7 @@ export default async function handler(request) {
     } catch {
       // Sentry indisponível — segue.
     }
-    return json({ error: 'database_error', message: error.message }, 500);
+    return json({ error: 'database_error' }, 500);
   }
 
   // Outros eventos (pix_gerado, boleto_gerado, recusas…): só registra

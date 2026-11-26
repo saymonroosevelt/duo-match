@@ -56,6 +56,15 @@ function pickGatewayId(payload) {
   );
 }
 
+// Normaliza o e-mail para o filtro ILIKE: recusa caracteres curinga
+// (% e *) e escapa "_" e "\\" para que um e-mail nunca case com o de outra pessoa
+// (ex.: "a_b@x.com" ativando a assinatura de "axb@x.com").
+function safeEmailPattern(raw) {
+  const email = String(raw || '').trim().toLowerCase();
+  if (!/^[^\s@%*]+@[^\s@%*]+\.[^\s@%*]+$/.test(email)) return null;
+  return email.replace(/[\\_]/g, (c) => `\\${c}`);
+}
+
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return json({ error: 'method_not_allowed' }, 405);
@@ -86,7 +95,7 @@ export const handler = async (event) => {
   }
 
   const eventType = payload?.webhook_event_type || '';
-  const customerEmail = pickCustomerEmail(payload);
+  const customerEmail = safeEmailPattern(pickCustomerEmail(payload));
   const gatewayId = pickGatewayId(payload);
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
@@ -117,13 +126,13 @@ export const handler = async (event) => {
         started_at: new Date().toISOString(),
         expires_at: expiresAt,
       })
-      .ilike('checkout_email', customerEmail.trim())
+      .ilike('checkout_email', customerEmail)
       .in('status', ['pending_payment', 'active', 'past_due'])
       .select('id, user_id, status');
 
     if (error) {
       console.error('Erro ao ativar assinatura:', error.message);
-      return json({ error: 'database_error', message: error.message }, 500);
+      return json({ error: 'database_error' }, 500);
     }
     await note('activated', { matched: data?.length || 0 });
     return json({ ok: true, matched: data?.length || 0, event: eventType });
@@ -137,13 +146,13 @@ export const handler = async (event) => {
     const { data, error } = await supabase
       .from('subscriptions')
       .update({ status: 'cancelled', gateway: 'kiwify' })
-      .ilike('checkout_email', customerEmail.trim())
+      .ilike('checkout_email', customerEmail)
       .in('status', ['active', 'pending_payment', 'past_due'])
       .select('id');
 
     if (error) {
       console.error('Erro ao cancelar assinatura:', error.message);
-      return json({ error: 'database_error', message: error.message }, 500);
+      return json({ error: 'database_error' }, 500);
     }
     await note('cancelled', { matched: data?.length || 0 });
     return json({ ok: true, matched: data?.length || 0, event: eventType });
@@ -154,7 +163,7 @@ export const handler = async (event) => {
     await supabase
       .from('subscriptions')
       .update({ status: 'past_due', gateway: 'kiwify' })
-      .ilike('checkout_email', customerEmail.trim())
+      .ilike('checkout_email', customerEmail)
       .eq('status', 'active');
     await note('marked_past_due');
     return json({ ok: true, event: eventType });
