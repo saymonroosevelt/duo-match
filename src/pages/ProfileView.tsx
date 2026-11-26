@@ -10,6 +10,7 @@ import {
   Sparkles,
   Users,
   Heart,
+  Share2,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { asArray, formatDate, isSubscriptionActive, profilePhotos } from '../lib/helpers';
@@ -249,6 +250,12 @@ export default function ProfileView({
             onClick={onEdit}
           />
           <MenuRow
+            icon={Share2}
+            label="Convidar amigos"
+            description="Mande o Duo Match no WhatsApp, Instagram ou Threads"
+            onClick={shareInvite}
+          />
+          <MenuRow
             icon={Users}
             label="Comunidades"
             description="Encontre pessoas pelos mesmos interesses"
@@ -291,6 +298,23 @@ export default function ProfileView({
       </div>
     </div>
   );
+}
+
+const INVITE_URL = 'https://duomatchapp.vercel.app/?utm_source=convite';
+const INVITE_TEXT =
+  'Tô usando o Duo Match: app de relacionamento com perfis aprovados à mão, sem fake e com localização protegida. Vem também 💌';
+
+async function shareInvite() {
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: 'Duo Match', text: INVITE_TEXT, url: INVITE_URL });
+      return;
+    }
+  } catch (error) {
+    if (error?.name === 'AbortError') return; // a pessoa fechou o menu
+  }
+  // Sem menu nativo (ex.: computador): abre o WhatsApp com a mensagem pronta
+  window.open(`https://wa.me/?text=${encodeURIComponent(`${INVITE_TEXT} ${INVITE_URL}`)}`, '_blank', 'noopener');
 }
 
 function MenuRow({ icon: Icon, label, description, onClick }) {
