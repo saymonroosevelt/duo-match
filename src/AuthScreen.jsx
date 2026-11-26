@@ -312,8 +312,8 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
           <h2 className="text-3xl font-serif mb-2 text-rose-50">{initialMode === 'login' ? 'Entre na sua conta.' : 'Criar sua conta.'}</h2>
           <p className="text-sm text-rose-100/50 leading-relaxed">
             {initialMode === 'login'
-              ? 'Entre na sua conta. A curadoria aprova cada perfil antes de liberar o acesso às conexões.'
-              : 'Criar sua conta. A curadoria aprova cada perfil antes de liberar o acesso às conexões.'}
+              ? 'Que bom te ver de novo. A curadoria aprova cada perfil antes de liberar o acesso às conexões.'
+              : 'Leva menos de 2 minutos. A curadoria aprova cada perfil antes de liberar o acesso às conexões.'}
           </p>
         </div>
 
