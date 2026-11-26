@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowLeft, Eye, EyeOff, Heart, Loader2, Lock, Mail } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { isValidEmail } from './lib/helpers';
+import Turnstile, { CAPTCHA_ENABLED } from './components/Turnstile';
 
 const AUTH_TIMEOUT_MS = 15000;
 
@@ -42,13 +43,13 @@ function clearLocalAttempts() {
 
 // Tenta a função serverless da Vercel (rate limit por IP real).
 // Retorna null se a função estiver indisponível — aí usamos o Supabase direto.
-async function tryRateLimitedLogin(email, password) {
+async function tryRateLimitedLogin(email, password, captchaToken) {
   let r;
   try {
     r = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, captchaToken }),
     });
   } catch {
     return null; // função inalcançável (offline, Netlify fora etc.)
@@ -65,6 +66,9 @@ async function tryRateLimitedLogin(email, password) {
 }
 
 function translateAuthError(message) {
+  if (/captcha/i.test(message)) {
+    return 'A verificação anti-robô falhou. Marque o quadro de novo e tente outra vez.';
+  }
   if (/invalid login credentials/i.test(message)) {
     return 'E-mail ou senha incorretos.';
   }
@@ -103,6 +107,21 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('error');
   const [resetLoading, setResetLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const captchaRef = useRef(null);
+
+  // Retorna o token do captcha (ou null se faltar) e já prepara um novo.
+  function takeCaptcha() {
+    if (!CAPTCHA_ENABLED) return undefined;
+    if (!captchaToken) {
+      setMessage('Confirme que você não é um robô no quadro abaixo.');
+      setMessageType('error');
+      return null;
+    }
+    const token = captchaToken;
+    captchaRef.current?.reset();
+    return token;
+  }
 
   async function handleAuth(isLogin) {
     if (loading) return;
@@ -129,6 +148,9 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
       return;
     }
 
+    const captcha = takeCaptcha();
+    if (captcha === null) return;
+
     setLoading(true);
 
     // Caminho preferencial quando for login: função serverless com rate limit por IP
@@ -144,7 +166,7 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
         return;
       }
 
-      const rl = await tryRateLimitedLogin(email.trim(), password);
+      const rl = await tryRateLimitedLogin(email.trim(), password, captcha);
 
       if (rl) {
         if (rl.status === 200 && rl.data?.access_token) {
@@ -167,6 +189,12 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
         if (rl.status === 429) {
           setLoading(false);
           setMessage(rl.data?.message || 'Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+          setMessageType('error');
+          return;
+        }
+        if (rl.data?.error === 'captcha_failed') {
+          setLoading(false);
+          setMessage(rl.data.message);
           setMessageType('error');
           return;
         }
@@ -203,11 +231,13 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
           ? supabase.auth.signInWithPassword({
               email: email.trim(),
               password,
+              options: { captchaToken: captcha },
             })
           : supabase.auth.signUp({
               email: email.trim(),
               password,
               options: {
+                captchaToken: captcha,
                 data: {
                   lgpd_accepted_at: new Date().toISOString(),
                 },
@@ -268,9 +298,13 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
       return;
     }
 
+    const captcha = takeCaptcha();
+    if (captcha === null) return;
+
     setResetLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo: window.location.origin,
+      captchaToken: captcha,
     });
     setResetLoading(false);
 
@@ -404,6 +438,8 @@ export default function AuthScreen({ onBack, initialMode = 'login' }) {
               . Tenho 18 anos ou mais.
             </span>
           </label>
+
+          <Turnstile ref={captchaRef} onToken={setCaptchaToken} />
 
           {message && (
             <div
